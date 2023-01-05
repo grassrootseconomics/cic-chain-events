@@ -1,0 +1,18 @@
+[metrics]
+expose = true
+
+[chain]
+graphql_endpoint = "https://rpc.alfajores.celo.grassecon.net/graphql"
+ws_endpoint      = "wss://ws.alfajores.celo.grassecon.net"
+
+[indexer]
+batch_size          = 500
+concurrency         = 10
+head_block_lag      = 5 
+idle_worker_timeout = 1
+initial_lower_bound = 15491311
+queue_size          = 1250
+sweep_interval      = 5
+
+[postgres]
+dsn   = "postgres://postgres:postgres@localhost:5432/cic_chain_events"
