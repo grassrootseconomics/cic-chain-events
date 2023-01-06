@@ -47,8 +47,7 @@ func (md *Pipeline) Run(blockNumber uint64) error {
 				return err
 			}
 			if !next {
-				md.logg.Debug("pipeline exit")
-				return nil
+				break
 			}
 		}
 	}

@@ -98,7 +98,6 @@ func (j *Janitor) QueueMissingBlocks() error {
 			return err
 		}
 
-		j.logg.Debug("submitting missing block for processing", "block", n)
 		j.pool.Submit(func() {
 			if err := j.pipeline.Run(n); err != nil {
 				j.logg.Error("pipeline run error", "error", err)

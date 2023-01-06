@@ -3,15 +3,14 @@ package main
 import (
 	"context"
 	"flag"
-	"net/http"
 	"os"
 	"os/signal"
+	"strings"
 	"sync"
 	"syscall"
 	"time"
 
-	"github.com/VictoriaMetrics/metrics"
-	"github.com/grassrootseconomics/cic-chain-events/internal/exporter"
+	"github.com/grassrootseconomics/cic-chain-events/internal/api"
 	"github.com/grassrootseconomics/cic-chain-events/internal/filter"
 	"github.com/grassrootseconomics/cic-chain-events/internal/pipeline"
 	"github.com/grassrootseconomics/cic-chain-events/internal/syncer"
@@ -44,6 +43,7 @@ func init() {
 func main() {
 	syncerStats := &syncer.Stats{}
 	wg := &sync.WaitGroup{}
+	apiServer := initApiServer()
 
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
@@ -58,7 +58,9 @@ func main() {
 	pipeline := pipeline.NewPipeline(pipeline.PipelineOpts{
 		BlockFetcher: graphqlFetcher,
 		Filters: []filter.Filter{
-			initNoopFilter(),
+			initAddressFilter(),
+			initTransferFilter(),
+			// initNoopFilter(),
 		},
 		Logg:  lo,
 		Store: pgStore,
@@ -86,6 +88,8 @@ func main() {
 		SweepInterval: time.Second * time.Duration(ko.MustInt64("indexer.sweep_interval")),
 	})
 
+	apiServer.GET("/stats", api.StatsHandler(syncerStats, workerPool, lo))
+
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
@@ -102,28 +106,26 @@ func main() {
 		}
 	}()
 
-	if ko.Bool("metrics.expose") {
-		metricsServer := &http.Server{
-			Addr: ":9090",
-		}
-
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
-			exporter.Register(syncerStats)
-
-			http.HandleFunc("/metrics", func(w http.ResponseWriter, _ *http.Request) {
-				metrics.WritePrometheus(w, true)
-			})
-
-			if err := metricsServer.ListenAndServe(); err != nil {
-				lo.Fatal("metrics server error", "error", err)
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		lo.Info("starting API server")
+		if err := apiServer.Start(ko.MustString("api.address")); err != nil {
+			if strings.Contains(err.Error(), "Server closed") {
+				lo.Info("shutting down server")
+			} else {
+				lo.Fatal("could not start api server", "err", err)
 			}
-		}()
-	}
+		}
+	}()
 
 	<-ctx.Done()
 	lo.Info("graceful shutdown triggered")
 
 	workerPool.Stop()
+	if err := apiServer.Shutdown(ctx); err != nil {
+		lo.Error("could not gracefully shutdown api server", "err", err)
+	}
+
+	wg.Wait()
 }

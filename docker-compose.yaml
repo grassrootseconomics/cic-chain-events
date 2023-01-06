@@ -7,7 +7,7 @@ services:
     environment:
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_USER=postgres
-      - POSTGRES_DB=cic_indexer
+      - POSTGRES_DB=cic_chain_events
     volumes:
       - cic-indexer-pg:/var/lib/postgresql/data
     ports:
