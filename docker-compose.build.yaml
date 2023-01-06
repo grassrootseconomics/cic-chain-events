@@ -1,0 +1,10 @@
+version: '3.9'
+services:
+  cic-chain-events:
+    image: ${IMAGE_BASE_URL:-ghcr.io/grassrootseconomics/cic-chain-events}/cic-chain-events:${TAG:-latest}
+    build:
+      context: .
+      dockerfile: Dockerfile
+      cache_from:
+        - ${IMAGE_BASE_URL:-ghcr.io/grassrootseconomics/cic-chain-events}/cic-chain-events:latest
+        
