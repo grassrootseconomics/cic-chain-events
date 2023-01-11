@@ -25,7 +25,7 @@ func NewAddressFilter(o AddressFilterOpts) Filter {
 	}
 }
 
-func (f *AddressFilter) Execute(ctx context.Context, transaction fetch.Transaction) (bool, error) {
+func (*AddressFilter) Execute(_ context.Context, transaction fetch.Transaction) (bool, error) {
 	if transaction.To.Address == cUSD {
 		return true, nil
 	}

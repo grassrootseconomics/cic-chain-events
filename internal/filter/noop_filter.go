@@ -21,7 +21,7 @@ func NewNoopFilter(o NoopFilterOpts) Filter {
 	}
 }
 
-func (f *NoopFilter) Execute(ctx context.Context, transaction fetch.Transaction) (bool, error) {
+func (f *NoopFilter) Execute(_ context.Context, transaction fetch.Transaction) (bool, error) {
 	f.logg.Debug("noop filter", "block", transaction.Block.Number, "index", transaction.Index)
 	return true, nil
 }

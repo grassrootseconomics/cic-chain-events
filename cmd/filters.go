@@ -16,8 +16,3 @@ func initTransferFilter() filter.Filter {
 	})
 }
 
-func initNoopFilter() filter.Filter {
-	return filter.NewNoopFilter(filter.NoopFilterOpts{
-		Logg: lo,
-	})
-}

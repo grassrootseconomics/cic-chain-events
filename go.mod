@@ -6,6 +6,7 @@ require (
 	github.com/VictoriaMetrics/metrics v1.23.0
 	github.com/alitto/pond v1.8.2
 	github.com/celo-org/celo-blockchain v1.6.1
+	github.com/goccy/go-json v0.10.0
 	github.com/jackc/pgx/v5 v5.2.0
 	github.com/knadh/goyesql/v2 v2.2.0
 	github.com/knadh/koanf v1.4.5
@@ -23,7 +24,6 @@ require (
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
 	github.com/go-ole/go-ole v1.2.5 // indirect
 	github.com/go-stack/stack v1.8.0 // indirect
-	github.com/goccy/go-json v0.10.0 // indirect
 	github.com/gorilla/websocket v1.4.2 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20200714003250-2b9c44734f2b // indirect

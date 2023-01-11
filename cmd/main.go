@@ -89,7 +89,7 @@ func main() {
 		SweepInterval: time.Second * time.Duration(ko.MustInt64("syncer.sweep_interval")),
 	})
 
-	apiServer.GET("/stats", api.StatsHandler(syncerStats, workerPool, lo))
+	apiServer.GET("/stats", api.StatsHandler(syncerStats, workerPool))
 
 	wg.Add(1)
 	go func() {

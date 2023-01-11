@@ -6,7 +6,6 @@ import (
 	"github.com/alitto/pond"
 	"github.com/grassrootseconomics/cic-chain-events/internal/syncer"
 	"github.com/labstack/echo/v4"
-	"github.com/zerodha/logf"
 )
 
 type statsResponse struct {
@@ -22,7 +21,6 @@ type statsResponse struct {
 func StatsHandler(
 	syncerStats *syncer.Stats,
 	poolStats *pond.WorkerPool,
-	logg logf.Logger,
 ) func(echo.Context) error {
 	return func(ctx echo.Context) error {
 		headCursor := syncerStats.GetHeadCursor()

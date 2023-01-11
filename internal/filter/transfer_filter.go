@@ -21,7 +21,7 @@ func NewTransferFilter(o TransferFilterOpts) Filter {
 	}
 }
 
-func (f *TransferFilter) Execute(ctx context.Context, transaction fetch.Transaction) (bool, error) {
+func (f *TransferFilter) Execute(_ context.Context, transaction fetch.Transaction) (bool, error) {
 	switch transaction.InputData[:10] {
 	case "0xa9059cbb":
 		f.logg.Info("cUSD transfer", "block", transaction.Block.Number, "index", transaction.Index)

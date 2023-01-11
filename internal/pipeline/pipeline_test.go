@@ -33,7 +33,7 @@ func newErrorFilter() filter.Filter {
 	return &errorFilter{}
 }
 
-func (f *errorFilter) Execute(ctx context.Context, transaction fetch.Transaction) (bool, error) {
+func (*errorFilter) Execute(_ context.Context, _ fetch.Transaction) (bool, error) {
 	return false, errors.New("crash")
 }
 
@@ -43,7 +43,7 @@ func newEarlyExitFilter() filter.Filter {
 	return &earlyExitFilter{}
 }
 
-func (f *earlyExitFilter) Execute(ctx context.Context, transaction fetch.Transaction) (bool, error) {
+func (*earlyExitFilter) Execute(_ context.Context, _ fetch.Transaction) (bool, error) {
 	return false, nil
 }
 
