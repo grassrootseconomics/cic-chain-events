@@ -1,8 +1,10 @@
 package fetch
 
+import "context"
+
 // Fetch defines a block fetcher that must return a full JSON response
 type Fetch interface {
-	Block(block uint64) (fetchResponse FetchResponse, err error)
+	Block(ctx context.Context, block uint64) (fetchResponse FetchResponse, err error)
 }
 
 // Transaction reprsents a JSON object of all important mined transaction information

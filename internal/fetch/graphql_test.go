@@ -1,13 +1,15 @@
 package fetch
 
 import (
+	"context"
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/suite"
 )
 
 var (
-	graphqlEndpoint = "https://rpc.celo.grassecon.net/graphql"
+	graphqlEndpoint = os.Getenv("TEST_GRAPHQL_ENDPOINT")
 )
 
 type itGraphqlTest struct {
@@ -26,12 +28,12 @@ func (s *itGraphqlTest) SetupSuite() {
 }
 
 func (s *itGraphqlTest) Test_E2E_Fetch_Existing_Block() {
-	resp, err := s.graphqlFetcher.Block(14974600)
+	resp, err := s.graphqlFetcher.Block(context.Background(), 14974600)
 	s.NoError(err)
 	s.Len(resp.Data.Block.Transactions, 3)
 }
 
 func (s *itGraphqlTest) Test_E2E_Fetch_Non_Existing_Block() {
-	_, err := s.graphqlFetcher.Block(14974600000)
+	_, err := s.graphqlFetcher.Block(context.Background(), 14974600000)
 	s.Error(err)
 }

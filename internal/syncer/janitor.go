@@ -51,32 +51,35 @@ func (j *Janitor) Start(ctx context.Context) error {
 
 	for {
 		select {
+		case <-ctx.Done():
+			j.logg.Info("janitor: shutdown signal received")
+			return nil
 		case <-timer.C:
-			j.logg.Debug("janitor starting sweep")
-			if err := j.QueueMissingBlocks(); err != nil {
-				j.logg.Error("janitor error", "error", err)
+			j.logg.Debug("janitor: starting sweep")
+			if err := j.QueueMissingBlocks(context.Background()); err != nil {
+				j.logg.Error("janitor: queue missing blocks error", "error", err)
 			}
 
 			timer.Reset(j.sweepInterval)
-		case <-ctx.Done():
-			j.logg.Debug("janitor shutdown signal received")
-			return nil
 		}
 	}
 }
 
-func (j *Janitor) QueueMissingBlocks() error {
+// QueueMissingBlocks searches for missing block and queues the block for processing.
+// It will run twice for a given search range and only after, raise the lower bound.
+func (j *Janitor) QueueMissingBlocks(ctx context.Context) error {
 	if j.stats.GetHeadCursor() == 0 {
-		j.logg.Debug("janitor waiting for head synchronization")
+		j.logg.Warn("janitor: (skipping) awaiting head synchronization")
 		return nil
 	}
 
 	if j.pool.WaitingTasks() >= j.batchSize {
-		j.logg.Debug("janitor skipping potential queue pressure")
+		j.logg.Warn("janitor: (skipping) avoiding queue pressure")
 		return nil
 	}
 
 	lowerBound, upperBound, err := j.store.GetSearchBounds(
+		ctx,
 		j.batchSize,
 		j.stats.GetHeadCursor(),
 		j.headBlockLag,
@@ -84,9 +87,8 @@ func (j *Janitor) QueueMissingBlocks() error {
 	if err != nil {
 		return err
 	}
-	j.logg.Debug("janitor search bounds", "lower_bound", lowerBound, "upper_bound", upperBound)
 
-	rows, err := j.store.GetMissingBlocks(lowerBound, upperBound)
+	rows, err := j.store.GetMissingBlocks(ctx, lowerBound, upperBound)
 	if err != nil {
 		return err
 	}
@@ -99,19 +101,18 @@ func (j *Janitor) QueueMissingBlocks() error {
 		}
 
 		j.pool.Submit(func() {
-			if err := j.pipeline.Run(n); err != nil {
-				j.logg.Error("pipeline run error", "error", err)
+			if err := j.pipeline.Run(ctx, n); err != nil {
+				j.logg.Error("janitor: pipeline run error", "error", err)
 			}
 		})
-
 		rowsProcessed++
 	}
 
-	j.logg.Debug("janitor missing block count", "count", rowsProcessed)
+	j.logg.Debug("janitor: missing blocks count", "count", rowsProcessed)
 	if rowsProcessed == 0 {
-		j.logg.Debug("no missing blocks, rasing lower bound")
+		j.logg.Debug("janitor: rasing lower bound")
 		j.stats.UpdateLowerBound(upperBound)
-		j.store.SetSearchLowerBound(upperBound)
+		j.store.SetSearchLowerBound(ctx, upperBound)
 	}
 
 	if rows.Err() != nil {

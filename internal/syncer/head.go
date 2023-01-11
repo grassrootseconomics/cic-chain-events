@@ -41,33 +41,34 @@ func NewHeadSyncer(o HeadSyncerOpts) (*HeadSyncer, error) {
 	}, nil
 }
 
+// Start creates a websocket subscription and actively receives new blocks untill stopped
+// or a critical error occurs.
 func (hs *HeadSyncer) Start(ctx context.Context) error {
-	headerReceiver := make(chan *types.Header, 10)
+	headerReceiver := make(chan *types.Header, 1)
 
 	sub, err := hs.ethClient.SubscribeNewHead(ctx, headerReceiver)
 	if err != nil {
 		return err
 	}
+	defer sub.Unsubscribe()
 
 	for {
 		select {
+		case <-ctx.Done():
+			hs.logg.Info("head syncer: shutdown signal received")
+			return nil
+		case err := <-sub.Err():
+			return err
 		case header := <-headerReceiver:
-			block := header.Number.Uint64()
-			hs.logg.Debug("head syncer received new block", "block", block)
+			blockNumber := header.Number.Uint64()
+			hs.logg.Debug("head syncer: received new block", "block", blockNumber)
 
-			hs.stats.UpdateHeadCursor(block)
+			hs.stats.UpdateHeadCursor(blockNumber)
 			hs.pool.Submit(func() {
-				if err := hs.pipeline.Run(block); err != nil {
-					hs.logg.Error("pipeline run error", "error", err)
+				if err := hs.pipeline.Run(context.Background(), blockNumber); err != nil {
+					hs.logg.Error("head syncer: piepline run error", "error", err)
 				}
 			})
-		case err := <-sub.Err():
-			hs.logg.Error("head syncer error", "error", err)
-			return err
-		case <-ctx.Done():
-			hs.logg.Debug("head syncer shutdown signnal received")
-			sub.Unsubscribe()
-			return nil
 		}
 	}
 }

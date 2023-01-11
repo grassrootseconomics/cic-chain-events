@@ -1,10 +1,11 @@
 package store
 
-// Store defines indexer get and set queries.
-// GetMissingBlocks returns a generic iterable.
+import "context"
+
+// Store defines all relevant get/set queries against the implemented storage backend.
 type Store[T any] interface {
-	GetSearchBounds(batchSize uint64, headCursor uint64, headBlockLag uint64) (lowerBound uint64, upperBound uint64, err error)
-	GetMissingBlocks(lowerBound uint64, upperBound uint64) (missingBlocksIterable T, err error)
-	SetSearchLowerBound(newLowerBound uint64) (err error)
-	CommitBlock(block uint64) (err error)
+	GetSearchBounds(ctx context.Context, batchSize uint64, headCursor uint64, headBlockLag uint64) (lowerBound uint64, upperBound uint64, err error)
+	GetMissingBlocks(ctx context.Context, lowerBound uint64, upperBound uint64) (missingBlocksIterable T, err error)
+	SetSearchLowerBound(ctx context.Context, newLowerBound uint64) (err error)
+	CommitBlock(ctx context.Context, block uint64) (err error)
 }

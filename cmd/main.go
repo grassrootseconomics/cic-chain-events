@@ -48,11 +48,13 @@ func main() {
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
 
+	workerPool := initWorkerPool(ctx)
+
 	pgStore, err := initPgStore()
 	if err != nil {
-		lo.Fatal("error loading pg store", "error", err)
+		lo.Fatal("main: critical error loading pg store", "error", err)
 	}
-	workerPool := initWorkerPool()
+
 	graphqlFetcher := initFetcher()
 
 	pipeline := pipeline.NewPipeline(pipeline.PipelineOpts{
@@ -60,7 +62,6 @@ func main() {
 		Filters: []filter.Filter{
 			initAddressFilter(),
 			initTransferFilter(),
-			// initNoopFilter(),
 		},
 		Logg:  lo,
 		Store: pgStore,
@@ -74,18 +75,18 @@ func main() {
 		WsEndpoint: ko.MustString("chain.ws_endpoint"),
 	})
 	if err != nil {
-		lo.Fatal("error loading head syncer", "error", err)
+		lo.Fatal("main: crticial error loading head syncer", "error", err)
 	}
 
 	janitor := syncer.NewJanitor(syncer.JanitorOpts{
-		BatchSize:     uint64(ko.MustInt64("indexer.batch_size")),
-		HeadBlockLag:  uint64(ko.MustInt64("indexer.head_block_lag")),
+		BatchSize:     uint64(ko.MustInt64("syncer.batch_size")),
+		HeadBlockLag:  uint64(ko.MustInt64("syncer.head_block_lag")),
 		Logg:          lo,
 		Pipeline:      pipeline,
 		Pool:          workerPool,
 		Stats:         syncerStats,
 		Store:         pgStore,
-		SweepInterval: time.Second * time.Duration(ko.MustInt64("indexer.sweep_interval")),
+		SweepInterval: time.Second * time.Duration(ko.MustInt64("syncer.sweep_interval")),
 	})
 
 	apiServer.GET("/stats", api.StatsHandler(syncerStats, workerPool, lo))
@@ -94,7 +95,7 @@ func main() {
 	go func() {
 		defer wg.Done()
 		if err := headSyncer.Start(ctx); err != nil {
-			lo.Fatal("head syncer error", "error", err)
+			lo.Fatal("main: critical error starting head syncer", "error", err)
 		}
 	}()
 
@@ -102,7 +103,7 @@ func main() {
 	go func() {
 		defer wg.Done()
 		if err := janitor.Start(ctx); err != nil {
-			lo.Fatal("janitor error", "error", err)
+			lo.Fatal("main: critical error starting janitor", "error", err)
 		}
 	}()
 
@@ -112,19 +113,19 @@ func main() {
 		lo.Info("starting API server")
 		if err := apiServer.Start(ko.MustString("api.address")); err != nil {
 			if strings.Contains(err.Error(), "Server closed") {
-				lo.Info("shutting down server")
+				lo.Info("main: shutting down server")
 			} else {
-				lo.Fatal("could not start api server", "err", err)
+				lo.Fatal("main: critical error shutting down server", "err", err)
 			}
 		}
 	}()
 
 	<-ctx.Done()
-	lo.Info("graceful shutdown triggered")
 
 	workerPool.Stop()
+
 	if err := apiServer.Shutdown(ctx); err != nil {
-		lo.Error("could not gracefully shutdown api server", "err", err)
+		lo.Error("main: could not gracefully shutdown api server", "err", err)
 	}
 
 	wg.Wait()

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"strings"
 
 	"github.com/alitto/pond"
@@ -60,7 +61,7 @@ func initQueries(queriesPath string) goyesql.Queries {
 func initPgStore() (store.Store[pgx.Rows], error) {
 	pgStore, err := store.NewPostgresStore(store.PostgresStoreOpts{
 		DSN:               ko.MustString("postgres.dsn"),
-		InitialLowerBound: uint64(ko.MustInt64("indexer.initial_lower_bound")),
+		InitialLowerBound: uint64(ko.MustInt64("syncer.initial_lower_bound")),
 		Logg:              lo,
 		Queries:           q,
 	})
@@ -71,10 +72,10 @@ func initPgStore() (store.Store[pgx.Rows], error) {
 	return pgStore, nil
 }
 
-func initWorkerPool() *pond.WorkerPool {
-	return pool.NewPool(pool.Opts{
-		ConcurrencyFactor: ko.MustInt("indexer.concurrency"),
-		PoolQueueSize:     ko.MustInt("indexer.queue_size"),
+func initWorkerPool(ctx context.Context) *pond.WorkerPool {
+	return pool.NewPool(ctx, pool.Opts{
+		ConcurrencyFactor: ko.MustInt("syncer.concurrency"),
+		PoolQueueSize:     ko.MustInt("syncer.queue_size"),
 	})
 }
 

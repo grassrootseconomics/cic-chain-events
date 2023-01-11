@@ -1,6 +1,8 @@
 package filter
 
 import (
+	"context"
+
 	"github.com/grassrootseconomics/cic-chain-events/internal/fetch"
 	"github.com/zerodha/logf"
 )
@@ -23,7 +25,7 @@ func NewAddressFilter(o AddressFilterOpts) Filter {
 	}
 }
 
-func (f *AddressFilter) Execute(transaction fetch.Transaction) (bool, error) {
+func (f *AddressFilter) Execute(ctx context.Context, transaction fetch.Transaction) (bool, error) {
 	if transaction.To.Address == cUSD {
 		return true, nil
 	}

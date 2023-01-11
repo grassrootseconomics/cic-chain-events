@@ -4,8 +4,7 @@ import (
 	"sync/atomic"
 )
 
-// Stats synchronize syncer values across the head and janitor.
-// could also be used to expose Prom gauges
+// Stats synchronizes block cursors values across the head and janitor.
 type Stats struct {
 	headCursor atomic.Uint64
 	lowerBound atomic.Uint64

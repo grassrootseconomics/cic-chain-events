@@ -60,14 +60,14 @@ func NewPostgresStore(o PostgresStoreOpts) (Store[pgx.Rows], error) {
 	return postgresStore, nil
 }
 
-func (s *PostgresStore) GetSearchBounds(batchSize uint64, headCursor uint64, headBlockLag uint64) (uint64, uint64, error) {
+func (s *PostgresStore) GetSearchBounds(ctx context.Context, batchSize uint64, headCursor uint64, headBlockLag uint64) (uint64, uint64, error) {
 	var (
 		lowerBound uint64
 		upperBound uint64
 	)
 
 	if err := s.pool.QueryRow(
-		context.Background(),
+		ctx,
 		s.queries.GetSearchBounds,
 		batchSize,
 		headCursor,
@@ -80,8 +80,8 @@ func (s *PostgresStore) GetSearchBounds(batchSize uint64, headCursor uint64, hea
 	return lowerBound, upperBound, nil
 }
 
-func (s *PostgresStore) GetMissingBlocks(lowerBound uint64, upperBound uint64) (pgx.Rows, error) {
-	rows, err := s.pool.Query(context.Background(), s.queries.GetMissingBlocks, lowerBound, upperBound)
+func (s *PostgresStore) GetMissingBlocks(ctx context.Context, lowerBound uint64, upperBound uint64) (pgx.Rows, error) {
+	rows, err := s.pool.Query(ctx, s.queries.GetMissingBlocks, lowerBound, upperBound)
 	if err != nil {
 		return nil, err
 	}
@@ -89,8 +89,8 @@ func (s *PostgresStore) GetMissingBlocks(lowerBound uint64, upperBound uint64) (
 	return rows, nil
 }
 
-func (s *PostgresStore) SetSearchLowerBound(newLowerBound uint64) error {
-	_, err := s.pool.Exec(context.Background(), s.queries.SetSearchLowerBound, newLowerBound)
+func (s *PostgresStore) SetSearchLowerBound(ctx context.Context, newLowerBound uint64) error {
+	_, err := s.pool.Exec(ctx, s.queries.SetSearchLowerBound, newLowerBound)
 	if err != nil {
 		return err
 	}
@@ -98,8 +98,8 @@ func (s *PostgresStore) SetSearchLowerBound(newLowerBound uint64) error {
 	return nil
 }
 
-func (s *PostgresStore) CommitBlock(block uint64) error {
-	_, err := s.pool.Exec(context.Background(), s.queries.CommitBlock, block)
+func (s *PostgresStore) CommitBlock(ctx context.Context, block uint64) error {
+	_, err := s.pool.Exec(ctx, s.queries.CommitBlock, block)
 	if err != nil {
 		return err
 	}

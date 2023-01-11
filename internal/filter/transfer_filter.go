@@ -1,6 +1,8 @@
 package filter
 
 import (
+	"context"
+
 	"github.com/grassrootseconomics/cic-chain-events/internal/fetch"
 	"github.com/zerodha/logf"
 )
@@ -19,7 +21,7 @@ func NewTransferFilter(o TransferFilterOpts) Filter {
 	}
 }
 
-func (f *TransferFilter) Execute(transaction fetch.Transaction) (bool, error) {
+func (f *TransferFilter) Execute(ctx context.Context, transaction fetch.Transaction) (bool, error) {
 	switch transaction.InputData[:10] {
 	case "0xa9059cbb":
 		f.logg.Info("cUSD transfer", "block", transaction.Block.Number, "index", transaction.Index)
