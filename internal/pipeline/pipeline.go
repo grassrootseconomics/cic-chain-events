@@ -39,7 +39,7 @@ func NewPipeline(o PipelineOpts) *Pipeline {
 // 3. Commits the block to store as successfully processed
 //
 // Note:
-// - Blocks are processed atomically, a failure inbetween will process the block from the start
+// - Blocks are processed atomically, a failure in-between will process the block from the start
 // - Therefore, any side effect/event sink in the filter should support dedup
 func (md *Pipeline) Run(ctx context.Context, blockNumber uint64) error {
 	md.logg.Debug("pipeline: processing block", "block", blockNumber)
@@ -63,7 +63,7 @@ func (md *Pipeline) Run(ctx context.Context, blockNumber uint64) error {
 	if err := md.store.CommitBlock(ctx, blockNumber); err != nil {
 		return err
 	}
-	md.logg.Debug("pipeline: commited block", "block", blockNumber)
+	md.logg.Debug("pipeline: committed block", "block", blockNumber)
 
 	return nil
 }

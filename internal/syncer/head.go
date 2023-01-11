@@ -41,7 +41,7 @@ func NewHeadSyncer(o HeadSyncerOpts) (*HeadSyncer, error) {
 	}, nil
 }
 
-// Start creates a websocket subscription and actively receives new blocks untill stopped
+// Start creates a websocket subscription and actively receives new blocks until stopped
 // or a critical error occurs.
 func (hs *HeadSyncer) Start(ctx context.Context) error {
 	headerReceiver := make(chan *types.Header, 1)

@@ -1,9 +1,10 @@
-# Exposes Prometheus metrics
 [metrics]
+# Exposes Prometheus metrics
 go_process = true
 
 # API server
 [api]
+# Host and port
 address = ":8080"
 
 # Geth API endpoints
