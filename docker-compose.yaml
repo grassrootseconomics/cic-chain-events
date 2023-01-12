@@ -17,6 +17,17 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+  nats:
+    image: nats:2.9
+    restart: unless-stopped
+    command: "-js -sd /nats/data"
+    volumes:
+      - cic-indexer-nats:/nats/data
+    ports:
+      - '4222:4222'
+      - '8222:8222'
 volumes:
   cic-indexer-pg:
     driver: local
+  cic-indexer-nats:
+    driver: local    
