@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/grassrootseconomics/cic-chain-events/internal/filter"
+	"github.com/grassrootseconomics/cic-chain-events/pkg/filter"
 )
 
 func initAddressFilter() filter.Filter {

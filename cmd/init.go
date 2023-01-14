@@ -5,9 +5,9 @@ import (
 	"strings"
 
 	"github.com/alitto/pond"
-	"github.com/grassrootseconomics/cic-chain-events/internal/fetch"
 	"github.com/grassrootseconomics/cic-chain-events/internal/pool"
 	"github.com/grassrootseconomics/cic-chain-events/internal/store"
+	"github.com/grassrootseconomics/cic-chain-events/pkg/fetch"
 	"github.com/jackc/pgx/v5"
 	"github.com/knadh/goyesql/v2"
 	"github.com/knadh/koanf"

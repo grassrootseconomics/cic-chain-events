@@ -13,6 +13,5 @@ mod:
 	go mod tidy
 	go mod verify
 
-test:
-	source .env.test
-	go test -v -covermode atomic -coverprofile=covprofile ./internal/...
+test-pkg:
+	TEST_GRAPHQL_ENDPOINT=https://rpc.alfajores.celo.grassecon.net/graphql go test -v -covermode atomic -coverprofile=covprofile ./pkg/...

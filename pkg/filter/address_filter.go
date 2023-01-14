@@ -5,7 +5,7 @@ import (
 	"sync"
 
 	celo "github.com/grassrootseconomics/cic-celo-sdk"
-	"github.com/grassrootseconomics/cic-chain-events/internal/fetch"
+	"github.com/grassrootseconomics/cic-chain-events/pkg/fetch"
 	"github.com/zerodha/logf"
 )
 

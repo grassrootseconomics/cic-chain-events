@@ -3,7 +3,7 @@ package filter
 import (
 	"context"
 
-	"github.com/grassrootseconomics/cic-chain-events/internal/fetch"
+	"github.com/grassrootseconomics/cic-chain-events/pkg/fetch"
 )
 
 // Filter defines a read only filter which must return next as true/false or an error

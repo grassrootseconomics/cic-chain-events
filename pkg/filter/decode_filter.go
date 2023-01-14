@@ -5,7 +5,7 @@ import (
 	"math/big"
 
 	"github.com/celo-org/celo-blockchain/common"
-	"github.com/grassrootseconomics/cic-chain-events/internal/fetch"
+	"github.com/grassrootseconomics/cic-chain-events/pkg/fetch"
 	"github.com/grassrootseconomics/w3-celo-patch"
 	"github.com/zerodha/logf"
 )

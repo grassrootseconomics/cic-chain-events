@@ -5,7 +5,7 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/grassrootseconomics/cic-chain-events/internal/fetch"
+	"github.com/grassrootseconomics/cic-chain-events/pkg/fetch"
 	"github.com/stretchr/testify/suite"
 	"github.com/zerodha/logf"
 )
