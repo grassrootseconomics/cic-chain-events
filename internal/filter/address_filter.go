@@ -2,31 +2,34 @@ package filter
 
 import (
 	"context"
+	"sync"
 
+	celo "github.com/grassrootseconomics/cic-celo-sdk"
 	"github.com/grassrootseconomics/cic-chain-events/internal/fetch"
 	"github.com/zerodha/logf"
 )
 
-const (
-	cUSD = "0x765de816845861e75a25fca122bb6898b8b1282a"
-)
-
 type AddressFilterOpts struct {
-	Logg logf.Logger
+	Cache        *sync.Map
+	CeloProvider *celo.Provider
+	Logg         logf.Logger
 }
 
 type AddressFilter struct {
-	logg logf.Logger
+	cache *sync.Map
+	logg  logf.Logger
 }
 
 func NewAddressFilter(o AddressFilterOpts) Filter {
+	// TODO: Bootstrap addresses from registry smart contract
 	return &AddressFilter{
-		logg: o.Logg,
+		cache: o.Cache,
+		logg:  o.Logg,
 	}
 }
 
-func (*AddressFilter) Execute(_ context.Context, transaction fetch.Transaction) (bool, error) {
-	if transaction.To.Address == cUSD {
+func (f *AddressFilter) Execute(_ context.Context, transaction fetch.Transaction) (bool, error) {
+	if _, found := f.cache.Load(transaction.To.Address); found {
 		return true, nil
 	}
 

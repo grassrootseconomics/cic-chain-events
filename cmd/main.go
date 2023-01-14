@@ -61,7 +61,7 @@ func main() {
 		BlockFetcher: graphqlFetcher,
 		Filters: []filter.Filter{
 			initAddressFilter(),
-			initTransferFilter(),
+			initDecodeFilter(),
 		},
 		Logg:  lo,
 		Store: pgStore,

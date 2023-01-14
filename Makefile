@@ -1,3 +1,4 @@
+SHELL := /bin/bash
 BIN := cic-chain-events
 
 .PHONY: build

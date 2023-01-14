@@ -10,9 +10,8 @@ func initAddressFilter() filter.Filter {
 	})
 }
 
-func initTransferFilter() filter.Filter {
-	return filter.NewTransferFilter(filter.TransferFilterOpts{
+func initDecodeFilter() filter.Filter {
+	return filter.NewDecodeFilter(filter.DecodeFilterOpts{
 		Logg: lo,
 	})
 }
-

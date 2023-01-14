@@ -12,28 +12,28 @@ var (
 	graphqlEndpoint = os.Getenv("TEST_GRAPHQL_ENDPOINT")
 )
 
-type itGraphqlTest struct {
+type GraphQlTestSuite struct {
 	suite.Suite
-	graphqlFetcher Fetch
+	fetch Fetch
 }
 
-func TestPipelineSuite(t *testing.T) {
-	suite.Run(t, new(itGraphqlTest))
-}
-
-func (s *itGraphqlTest) SetupSuite() {
-	s.graphqlFetcher = NewGraphqlFetcher(GraphqlOpts{
+func (s *GraphQlTestSuite) SetupSuite() {
+	s.fetch = NewGraphqlFetcher(GraphqlOpts{
 		GraphqlEndpoint: graphqlEndpoint,
 	})
 }
 
-func (s *itGraphqlTest) Test_E2E_Fetch_Existing_Block() {
-	resp, err := s.graphqlFetcher.Block(context.Background(), 14974600)
+func (s *GraphQlTestSuite) Test_E2E_Fetch_Existing_Block() {
+	resp, err := s.fetch.Block(context.Background(), 14974600)
 	s.NoError(err)
 	s.Len(resp.Data.Block.Transactions, 3)
 }
 
-func (s *itGraphqlTest) Test_E2E_Fetch_Non_Existing_Block() {
-	_, err := s.graphqlFetcher.Block(context.Background(), 14974600000)
+func (s *GraphQlTestSuite) Test_E2E_Fetch_Non_Existing_Block() {
+	_, err := s.fetch.Block(context.Background(), 14974600000)
 	s.Error(err)
+}
+
+func TestGraphQlSuite(t *testing.T) {
+	suite.Run(t, new(GraphQlTestSuite))
 }
