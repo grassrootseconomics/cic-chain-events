@@ -7,6 +7,7 @@ import (
 	"github.com/celo-org/celo-blockchain/common"
 	"github.com/grassrootseconomics/cic-chain-events/pkg/fetch"
 	"github.com/grassrootseconomics/w3-celo-patch"
+	"github.com/nats-io/nats.go"
 	"github.com/zerodha/logf"
 )
 
@@ -17,16 +18,19 @@ var (
 )
 
 type DecodeFilterOpts struct {
-	Logg logf.Logger
+	Logg  logf.Logger
+	JSCtx nats.JetStreamContext
 }
 
 type DecodeFilter struct {
 	logg logf.Logger
+	js   nats.JetStreamContext
 }
 
 func NewDecodeFilter(o DecodeFilterOpts) Filter {
 	return &DecodeFilter{
 		logg: o.Logg,
+		js:   o.JSCtx,
 	}
 }
 
@@ -42,7 +46,11 @@ func (f *DecodeFilter) Execute(_ context.Context, transaction fetch.Transaction)
 			return false, err
 		}
 
-		f.logg.Debug("transfer", "to", to.Hex(), "value", value.String())
+		_, err := f.js.Publish("CHAIN.transfer", []byte(transaction.Hash), nats.MsgId(transaction.Hash))
+		if err != nil {
+			return false, err
+		}
+
 		return true, nil
 	case "0x23b872dd":
 		var (
@@ -55,7 +63,11 @@ func (f *DecodeFilter) Execute(_ context.Context, transaction fetch.Transaction)
 			return false, err
 		}
 
-		f.logg.Debug("transferFrom", "from", from.Hex(), "to", to.Hex(), "value", value.String())
+		_, err := f.js.Publish("CHAIN.transferFrom", []byte(transaction.Hash), nats.MsgId(transaction.Hash))
+		if err != nil {
+			return false, err
+		}
+
 		return true, nil
 	case "0x449a52f8":
 		var (
@@ -67,7 +79,11 @@ func (f *DecodeFilter) Execute(_ context.Context, transaction fetch.Transaction)
 			return false, err
 		}
 
-		f.logg.Debug("mintTo", "to", to.Hex(), "value", value.String())
+		_, err := f.js.Publish("CHAIN.mintTo", []byte(transaction.Hash), nats.MsgId(transaction.Hash))
+		if err != nil {
+			return false, err
+		}
+
 		return true, nil
 	default:
 		f.logg.Debug("unknownSignature", "inpuData", transaction.InputData)

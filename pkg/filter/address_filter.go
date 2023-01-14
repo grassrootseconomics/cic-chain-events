@@ -4,15 +4,13 @@ import (
 	"context"
 	"sync"
 
-	celo "github.com/grassrootseconomics/cic-celo-sdk"
 	"github.com/grassrootseconomics/cic-chain-events/pkg/fetch"
 	"github.com/zerodha/logf"
 )
 
 type AddressFilterOpts struct {
-	Cache        *sync.Map
-	CeloProvider *celo.Provider
-	Logg         logf.Logger
+	Cache *sync.Map
+	Logg  logf.Logger
 }
 
 type AddressFilter struct {
@@ -21,7 +19,6 @@ type AddressFilter struct {
 }
 
 func NewAddressFilter(o AddressFilterOpts) Filter {
-	// TODO: Bootstrap addresses from registry smart contract
 	return &AddressFilter{
 		cache: o.Cache,
 		logg:  o.Logg,
