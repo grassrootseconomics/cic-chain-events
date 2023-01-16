@@ -7,11 +7,12 @@ require (
 	github.com/alitto/pond v1.8.2
 	github.com/celo-org/celo-blockchain v1.6.1
 	github.com/goccy/go-json v0.10.0
-	github.com/grassrootseconomics/cic-celo-sdk v0.3.1
+	github.com/grassrootseconomics/w3-celo-patch v0.1.0
 	github.com/jackc/pgx/v5 v5.2.0
 	github.com/knadh/goyesql/v2 v2.2.0
 	github.com/knadh/koanf v1.4.5
 	github.com/labstack/echo/v4 v4.9.0
+	github.com/nats-io/nats.go v1.22.1
 	github.com/stretchr/testify v1.8.1
 	github.com/zerodha/logf v0.5.5
 )
@@ -30,7 +31,6 @@ require (
 	github.com/go-stack/stack v1.8.0 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
 	github.com/gorilla/websocket v1.4.2 // indirect
-	github.com/grassrootseconomics/w3-celo-patch v0.1.0 // indirect
 	github.com/hashicorp/golang-lru v0.5.5-0.20210104140557-80c98217689d // indirect
 	github.com/hdevalence/ed25519consensus v0.0.0-20201207055737-7fde80a9d5ff // indirect
 	github.com/holiman/bloomfilter/v2 v2.0.3 // indirect
@@ -47,7 +47,7 @@ require (
 	github.com/mitchellh/copystructure v1.2.0 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/mitchellh/reflectwalk v1.0.2 // indirect
-	github.com/nats-io/nats.go v1.22.1 // indirect
+	github.com/nats-io/nats-server/v2 v2.9.11 // indirect
 	github.com/nats-io/nkeys v0.3.0 // indirect
 	github.com/nats-io/nuid v1.0.1 // indirect
 	github.com/olekukonko/tablewriter v0.0.5 // indirect

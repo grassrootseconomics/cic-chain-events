@@ -41,6 +41,13 @@ func init() {
 }
 
 func main() {
+	// p := profiler.New(profiler.Conf{
+	// 	DirPath:        "profiles",
+	// 	Quiet:          true,
+	// 	NoShutdownHook: false,
+	// }, profiler.Cpu, profiler.Mem)
+	// p.Start()
+
 	syncerStats := &syncer.Stats{}
 	wg := &sync.WaitGroup{}
 	apiServer := initApiServer()
@@ -129,4 +136,5 @@ func main() {
 	}
 
 	wg.Wait()
+	// p.Stop()
 }
