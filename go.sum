@@ -248,6 +248,8 @@ github.com/gorilla/mux v1.8.0/go.mod h1:DVbg23sWSpFRCP0SfiEN6jmj59UnW/n46BH5rLB7
 github.com/gorilla/websocket v1.4.2 h1:+/TMaTYc4QFitKJxsQ7Yye35DkWvkdLcvGKqM+x0Ufc=
 github.com/gorilla/websocket v1.4.2/go.mod h1:YR8l580nyteQvAITg2hZ9XVh4b55+EU/adAjf1fMHhE=
 github.com/graph-gophers/graphql-go v1.3.0/go.mod h1:9CQHMSxwO4MprSdzoIEobiHpoLtHm77vfxsvsIN5Vuc=
+github.com/grassrootseconomics/cic-celo-sdk v0.3.1 h1:SzmMFrqxSIdgePqwbUdoS3PNP82MFnlOecycVk2ZYWg=
+github.com/grassrootseconomics/cic-celo-sdk v0.3.1/go.mod h1:EiR6d03GYu6jlVKNL1MbTAw/bqAW2WP3J/lkrZxPMdU=
 github.com/grassrootseconomics/w3-celo-patch v0.1.0 h1:0fev2hYkGEyFX2D4oUG8yy4jXhtHv7qUtLLboXL5ycw=
 github.com/grassrootseconomics/w3-celo-patch v0.1.0/go.mod h1:JtkXc+yDUiQQJdhYTqddZI/itdYGHY7H8PNZzBo4hCk=
 github.com/grpc-ecosystem/go-grpc-prometheus v1.2.0/go.mod h1:8NvIoxWQoOIhqOTXgfV/d3M/q6VIi02HzZEHgUlZvzk=

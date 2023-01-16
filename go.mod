@@ -7,6 +7,7 @@ require (
 	github.com/alitto/pond v1.8.2
 	github.com/celo-org/celo-blockchain v1.6.1
 	github.com/goccy/go-json v0.10.0
+	github.com/grassrootseconomics/cic-celo-sdk v0.3.1
 	github.com/grassrootseconomics/w3-celo-patch v0.1.0
 	github.com/jackc/pgx/v5 v5.2.0
 	github.com/knadh/goyesql/v2 v2.2.0
