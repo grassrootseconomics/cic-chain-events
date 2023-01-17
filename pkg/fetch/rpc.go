@@ -3,7 +3,9 @@ package fetch
 import (
 	"context"
 	"math/big"
+	"strings"
 
+	"github.com/celo-org/celo-blockchain/common/hexutil"
 	"github.com/celo-org/celo-blockchain/core/types"
 	celo "github.com/grassrootseconomics/cic-celo-sdk"
 	"github.com/grassrootseconomics/w3-celo-patch/module/eth"
@@ -37,7 +39,7 @@ func (f *RPC) Block(ctx context.Context, blockNumber uint64) (FetchResponse, err
 		ctx,
 		eth.BlockByNumber(big.NewInt(int64(blockNumber))).Returns(&block),
 	); err != nil {
-		return FetchResponse{}, nil
+		return FetchResponse{}, err
 	}
 
 	txCount := len(block.Transactions())
@@ -58,7 +60,31 @@ func (f *RPC) Block(ctx context.Context, blockNumber uint64) (FetchResponse, err
 		return FetchResponse{}, nil
 	}
 
-	// TODO: Create FetchResponse
+	for i := 0; i < txCount; i++ {
+		tx := Transaction{}
+
+		tx.Block.Number = block.NumberU64()
+		tx.Block.Timestamp = hexutil.EncodeUint64(block.Time())
+		tx.Hash = txsReceipt[i].TxHash.Hex()
+		tx.Index = txsReceipt[i].TransactionIndex
+
+		from, err := types.Sender(types.LatestSignerForChainID(txs[i].ChainId()), &txs[i])
+		if err != nil {
+			return FetchResponse{}, err
+		}
+
+		tx.From.Address = strings.ToLower(from.Hex())
+		tx.To.Address = strings.ToLower(txs[i].To().Hex())
+		tx.Value = hexutil.EncodeBig(txs[i].Value())
+		tx.InputData = hexutil.Encode(txs[i].Data())
+		tx.Status = txsReceipt[i].Status
+		tx.GasUsed = txsReceipt[i].GasUsed
+
+		fetchResponse.Data.Block.Transactions = append(
+			fetchResponse.Data.Block.Transactions,
+			tx,
+		)
+	}
 
 	return fetchResponse, nil
 }
