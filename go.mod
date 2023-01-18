@@ -12,7 +12,7 @@ require (
 	github.com/knadh/goyesql/v2 v2.2.0
 	github.com/knadh/koanf v1.4.5
 	github.com/labstack/echo/v4 v4.9.0
-	github.com/nats-io/nats.go v1.22.1
+	github.com/nats-io/nats.go v1.23.0
 	github.com/stretchr/testify v1.8.1
 	github.com/zerodha/logf v0.5.5
 )
