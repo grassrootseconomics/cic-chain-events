@@ -10,24 +10,19 @@ address = ":8080"
 # Geth API endpoints
 [chain]
 graphql_endpoint = "https://rpc.celo.grassecon.net/graphql"
-ws_endpoint      = "wss://ws.celo.grassecon.net"
+ws_endpoint      = "wss://socket.celo.grassecon.net"
 
-# Syncer configs
 [syncer]
-# Maximum number of missing blocks pushed into the worker queue every janitor sweep
-batch_size          = 200
 # Number of goroutines assigned to the worker pool
-concurrency         = 3
-# Prevents reprocessing head block already in queue
-head_block_lag      = 5
+janitor_concurrency    = 5
 # Max idle time after which goroutine is returned back to the pool
-idle_worker_timeout = 1
+idle_worker_timeout    = 1
 # Syncer start block
-initial_lower_bound = 17204504
+initial_lower_bound    = 17269000
 # Max blocks in worker queue awaiting processing
-queue_size          = 500
+janitor_queue_size     = 500
 # Janitor sweep interval, should take into account concurrency and queue_size
-sweep_interval      = 10
+janitor_sweep_interval = 5
 
 [postgres]
 dsn   = "postgres://postgres:postgres@localhost:5432/cic_chain_events"
@@ -46,3 +41,7 @@ stream_subjects        = [
     "CHAIN.transferFrom",
     "CHAIN.mintTo"
 ]
+
+# 77G - snapshot
+# 111G - decompressed
+# 112G - latest
