@@ -1,52 +1,38 @@
 ## Functionality
 
+## Filters
+
+Filters are initialized in `cmd/filters.go` and implemented in `internal/filters/*.go` folder. You will need to modify these files to suite your indexing needs.
+
+The existing implementation demo's tracking Celo stables transfer events and gives a rough idea on how to write filters. The final filter should always emit an event to NATS JetStream.
+
+## Syncers
+
 ### Head syncer
 
-Opens a websocket connection and processes live transactions.
+The head syncer processes newely produced blocks independently by connection to the geth websocket endpoint.
 
 ### Janitor
 
-Periodically checks for missed (and historical) blocks missed by the head syncer and queues them for processing. A gap range is processed twice to guarantee there is no missing block.
+The janitor syncer checks for missing (blocks) gaps in the commited block sequence and queues them for processing. It can also function as a historical syncer too process older blocks.
 
-### Pipeline
+With the default `config.toml`, The janitor can process around 950-1000 blocks/min.
 
-Fetches a block and executes the filters in serial order for every transaction in the block before finally committing the block to the store.
+_Ordering_
 
-### Filter
+Missed/historical blocks are not guaranteed to be processed in order, however a low concurrency setting would somewhat give an "in-order" behaviour (not to be relied upon in any case).
 
-Processes a transaction and passes it on to the next filter or terminates the pipeline for that transaction if it is irrelevant.
+## Block fetchers
 
-### Store schema
+The default GraphQL block fetcher is the recommended fetcher. An experimental RPC fetcher implementation is also provided as an example.
+
+## Pipeline
+
+The pipeline fetches a whole block with its full transaction and receipt objects, executes all loaded filters serially and finally commits the block value to the db. Blocks are processed atomically by the pipeline; a failure in one of the filters will trigger the janitor to re-queue the block and process the block again.
+
+## Store
+
+The postgres store keeps track of commited blocks and syncer curosors. Schema:
 
 - The `blocks` table keeps track of processed blocks.
 - The `syncer_meta` table keeps track of the lower_bound cursor. Below the lower_bound cursor, all blocks are guarnteed to have been processsed hence it is safe to trim the `blocks` table below that pointer.
-
-### GraphQL
-
-- Fetches a block (and some of its header details), transactions and transaction receipts embedded within the transaction object in a single call.
-
-### NATS JetStream
-
-- The final filter will emit an event to JetStream.
-
-To view/debug the JetStream messages, you can use [Benthos](https://benthos.dev)
-
-With a config like:
-
-```yaml
-input:
-  label: jetstream
-  nats_jetstream:
-    urls:
-      - nats://127.0.0.1:4222
-    subject: "CHAIN.*"
-    durable: benthos
-    deliver: all
-output:
-  stdout:
-    codec: lines
-```
-
-## Caveats
-
-- Blocks are not guaranteed to be processed in order, however a low concurrency setting would somewhat give an "in-order" behaviour (not to be relied upon in any case).
