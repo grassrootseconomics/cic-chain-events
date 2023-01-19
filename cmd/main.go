@@ -10,8 +10,8 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/grassrootseconomics/cic-chain-events/internal/api"
 	"github.com/grassrootseconomics/cic-chain-events/internal/pipeline"
+	"github.com/grassrootseconomics/cic-chain-events/internal/pool"
 	"github.com/grassrootseconomics/cic-chain-events/internal/syncer"
 	"github.com/grassrootseconomics/cic-chain-events/internal/filter"
 	"github.com/knadh/goyesql/v2"
@@ -41,13 +41,6 @@ func init() {
 }
 
 func main() {
-	// p := profiler.New(profiler.Conf{
-	// 	DirPath:        "profiles",
-	// 	Quiet:          true,
-	// 	NoShutdownHook: false,
-	// }, profiler.Cpu, profiler.Mem)
-	// p.Start()
-
 	syncerStats := &syncer.Stats{}
 	wg := &sync.WaitGroup{}
 	apiServer := initApiServer()
@@ -55,7 +48,10 @@ func main() {
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
 
-	workerPool := initWorkerPool(ctx)
+	janitorWorkerPool := pool.NewPool(ctx, pool.Opts{
+		Concurrency: ko.MustInt("syncer.janitor_concurrency"),
+		QueueSize:   ko.MustInt("syncer.janitor_queue_size"),
+	})
 
 	pgStore, err := initPgStore()
 	if err != nil {
@@ -74,10 +70,15 @@ func main() {
 		Store: pgStore,
 	})
 
+	headSyncerWorker := pool.NewPool(ctx, pool.Opts{
+		Concurrency: 1,
+		QueueSize:   1,
+	})
+
 	headSyncer, err := syncer.NewHeadSyncer(syncer.HeadSyncerOpts{
 		Logg:       lo,
 		Pipeline:   pipeline,
-		Pool:       workerPool,
+		Pool:       headSyncerWorker,
 		Stats:      syncerStats,
 		WsEndpoint: ko.MustString("chain.ws_endpoint"),
 	})
@@ -86,17 +87,14 @@ func main() {
 	}
 
 	janitor := syncer.NewJanitor(syncer.JanitorOpts{
-		BatchSize:     uint64(ko.MustInt64("syncer.batch_size")),
-		HeadBlockLag:  uint64(ko.MustInt64("syncer.head_block_lag")),
+		BatchSize:     uint64(ko.MustInt64("syncer.janitor_queue_size")),
 		Logg:          lo,
 		Pipeline:      pipeline,
-		Pool:          workerPool,
+		Pool:          janitorWorkerPool,
 		Stats:         syncerStats,
 		Store:         pgStore,
-		SweepInterval: time.Second * time.Duration(ko.MustInt64("syncer.sweep_interval")),
+		SweepInterval: time.Second * time.Duration(ko.MustInt64("syncer.janitor_sweep_interval")),
 	})
-
-	apiServer.GET("/stats", api.StatsHandler(syncerStats, workerPool))
 
 	wg.Add(1)
 	go func() {
@@ -129,12 +127,9 @@ func main() {
 
 	<-ctx.Done()
 
-	workerPool.Stop()
-
 	if err := apiServer.Shutdown(ctx); err != nil {
 		lo.Error("main: could not gracefully shutdown api server", "err", err)
 	}
 
 	wg.Wait()
-	// p.Stop()
 }

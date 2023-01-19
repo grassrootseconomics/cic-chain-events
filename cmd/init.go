@@ -1,12 +1,9 @@
 package main
 
 import (
-	"context"
 	"strings"
 	"time"
 
-	"github.com/alitto/pond"
-	"github.com/grassrootseconomics/cic-chain-events/internal/pool"
 	"github.com/grassrootseconomics/cic-chain-events/internal/store"
 	"github.com/grassrootseconomics/cic-chain-events/pkg/fetch"
 	"github.com/jackc/pgx/v5"
@@ -72,13 +69,6 @@ func initPgStore() (store.Store[pgx.Rows], error) {
 	}
 
 	return pgStore, nil
-}
-
-func initWorkerPool(ctx context.Context) *pond.WorkerPool {
-	return pool.NewPool(ctx, pool.Opts{
-		ConcurrencyFactor: ko.MustInt("syncer.concurrency"),
-		PoolQueueSize:     ko.MustInt("syncer.queue_size"),
-	})
 }
 
 func initFetcher() fetch.Fetch {

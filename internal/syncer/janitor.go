@@ -11,9 +11,12 @@ import (
 	"github.com/zerodha/logf"
 )
 
+const (
+	headBlockLag = 5
+)
+
 type JanitorOpts struct {
 	BatchSize     uint64
-	HeadBlockLag  uint64
 	Logg          logf.Logger
 	Pipeline      *pipeline.Pipeline
 	Pool          *pond.WorkerPool
@@ -24,7 +27,6 @@ type JanitorOpts struct {
 
 type Janitor struct {
 	batchSize     uint64
-	headBlockLag  uint64
 	pipeline      *pipeline.Pipeline
 	logg          logf.Logger
 	pool          *pond.WorkerPool
@@ -36,7 +38,6 @@ type Janitor struct {
 func NewJanitor(o JanitorOpts) *Janitor {
 	return &Janitor{
 		batchSize:     o.BatchSize,
-		headBlockLag:  o.HeadBlockLag,
 		logg:          o.Logg,
 		pipeline:      o.Pipeline,
 		pool:          o.Pool,
@@ -73,8 +74,8 @@ func (j *Janitor) QueueMissingBlocks(ctx context.Context) error {
 		return nil
 	}
 
-	if j.pool.WaitingTasks() >= j.batchSize {
-		j.logg.Warn("janitor: (skipping) avoiding queue pressure")
+	if j.pool.WaitingTasks() != 0 {
+		j.logg.Debug("janitor: (skipping) queue has pending jobs", "pending_jobs", j.pool.WaitingTasks())
 		return nil
 	}
 
@@ -82,7 +83,7 @@ func (j *Janitor) QueueMissingBlocks(ctx context.Context) error {
 		ctx,
 		j.batchSize,
 		j.stats.GetHeadCursor(),
-		j.headBlockLag,
+		headBlockLag,
 	)
 	if err != nil {
 		return err
@@ -95,13 +96,13 @@ func (j *Janitor) QueueMissingBlocks(ctx context.Context) error {
 
 	rowsProcessed := 0
 	for rows.Next() {
-		var n uint64
-		if err := rows.Scan(&n); err != nil {
+		var blockNumber uint64
+		if err := rows.Scan(&blockNumber); err != nil {
 			return err
 		}
 
 		j.pool.Submit(func() {
-			if err := j.pipeline.Run(ctx, n); err != nil {
+			if err := j.pipeline.Run(ctx, blockNumber); err != nil {
 				j.logg.Error("janitor: pipeline run error", "error", err)
 			}
 		})
@@ -110,7 +111,7 @@ func (j *Janitor) QueueMissingBlocks(ctx context.Context) error {
 
 	j.logg.Debug("janitor: missing blocks count", "count", rowsProcessed)
 	if rowsProcessed == 0 {
-		j.logg.Debug("janitor: rasing lower bound")
+		j.logg.Info("janitor: no gap! rasing lower bound", "new_lower_bound", upperBound)
 		j.stats.UpdateLowerBound(upperBound)
 		j.store.SetSearchLowerBound(ctx, upperBound)
 	}

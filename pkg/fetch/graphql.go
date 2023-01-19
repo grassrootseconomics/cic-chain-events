@@ -26,7 +26,7 @@ type Graphql struct {
 func NewGraphqlFetcher(o GraphqlOpts) Fetch {
 	return &Graphql{
 		httpClient: &http.Client{
-			Timeout: time.Second * 2,
+			Timeout: time.Second * 5,
 		},
 		graphqlEndpoint: o.GraphqlEndpoint,
 	}

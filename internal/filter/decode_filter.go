@@ -2,6 +2,7 @@ package filter
 
 import (
 	"context"
+	"fmt"
 	"math/big"
 
 	"github.com/celo-org/celo-blockchain/common"
@@ -46,7 +47,7 @@ func (f *DecodeFilter) Execute(_ context.Context, transaction fetch.Transaction)
 			return false, err
 		}
 
-		_, err := f.js.Publish("CHAIN.transfer", []byte(transaction.Hash), nats.MsgId(transaction.Hash))
+		_, err := f.js.Publish("CHAIN.transfer", []byte(fmt.Sprintf("%d:%d:%s", transaction.Block.Number, transaction.Index, transaction.Hash)), nats.MsgId(transaction.Hash))
 		if err != nil {
 			return false, err
 		}
@@ -63,7 +64,7 @@ func (f *DecodeFilter) Execute(_ context.Context, transaction fetch.Transaction)
 			return false, err
 		}
 
-		_, err := f.js.Publish("CHAIN.transferFrom", []byte(transaction.Hash), nats.MsgId(transaction.Hash))
+		_, err := f.js.Publish("CHAIN.transferFrom", []byte(fmt.Sprintf("%d:%d:%s", transaction.Block.Number, transaction.Index, transaction.Hash)), nats.MsgId(transaction.Hash))
 		if err != nil {
 			return false, err
 		}
@@ -79,7 +80,7 @@ func (f *DecodeFilter) Execute(_ context.Context, transaction fetch.Transaction)
 			return false, err
 		}
 
-		_, err := f.js.Publish("CHAIN.mintTo", []byte(transaction.Hash), nats.MsgId(transaction.Hash))
+		_, err := f.js.Publish("CHAIN.mintTo", []byte(fmt.Sprintf("%d:%d:%s", transaction.Block.Number, transaction.Index, transaction.Hash)), nats.MsgId(transaction.Hash))
 		if err != nil {
 			return false, err
 		}
