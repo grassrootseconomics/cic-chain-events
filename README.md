@@ -6,7 +6,7 @@
 
 > CIC Chain Events
 
-Filters live (and past) transactions on Celo and emits relevant transfer events to a NATS JetStream sink for further processing/indexing.
+Filters live (and past) transactions on Celo and emits relevant events to a NATS JetStream sink for further processing/indexing.
 
 ## Prerequisites
 
@@ -29,7 +29,7 @@ The base config is described in `config.toml`. Values can be overriden with env 
 
 ### 3. Start the service
 
-#### Compiling binary
+**Compiling the binary**
 
 Run `make build` or download pre-compiled binaries from the [releases](https://github.com/grassrootseconomics/cic-chain-events/releases) page.
 
@@ -41,7 +41,7 @@ Optional flags:
 - `-debug` - Enable/disable debug level logs
 - `-queries` - `queries.sql` file path
 
-#### Docker
+**Docker**
 
 To pull the pre-built docker image:
 
