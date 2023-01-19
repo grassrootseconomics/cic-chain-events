@@ -66,7 +66,7 @@ func (s *DecodeFilterSuite) TestTranfserInputs() {
 	}
 
 	for _, test := range tests {
-		next, err := s.filter.Execute(context.Background(), test.transactionData)
+		next, err := s.filter.Execute(context.Background(), &test.transactionData)
 		s.NoError(err)
 		s.Equal(test.want, next)
 	}

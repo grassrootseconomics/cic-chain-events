@@ -2,7 +2,7 @@ package filter
 
 import (
 	"context"
-	"fmt"
+	"encoding/json"
 	"math/big"
 
 	"github.com/celo-org/celo-blockchain/common"
@@ -28,6 +28,17 @@ type DecodeFilter struct {
 	js   nats.JetStreamContext
 }
 
+type minimalTxInfo struct {
+	Block        uint64 `json:"block"`
+	From         string `json:"from"`
+	Success      bool   `json:"success"`
+	To           string `json:"to"`
+	TokenAddress string `json:"tokenAddress"`
+	TxHash       string `json:"transactionHash"`
+	TxIndex      uint   `json:"transactionIndex"`
+	Value        uint64 `json:"value"`
+}
+
 func NewDecodeFilter(o DecodeFilterOpts) Filter {
 	return &DecodeFilter{
 		logg: o.Logg,
@@ -35,7 +46,7 @@ func NewDecodeFilter(o DecodeFilterOpts) Filter {
 	}
 }
 
-func (f *DecodeFilter) Execute(_ context.Context, transaction fetch.Transaction) (bool, error) {
+func (f *DecodeFilter) Execute(_ context.Context, transaction *fetch.Transaction) (bool, error) {
 	switch transaction.InputData[:10] {
 	case "0xa9059cbb":
 		var (
@@ -47,7 +58,26 @@ func (f *DecodeFilter) Execute(_ context.Context, transaction fetch.Transaction)
 			return false, err
 		}
 
-		_, err := f.js.Publish("CHAIN.transfer", []byte(fmt.Sprintf("%d:%d:%s", transaction.Block.Number, transaction.Index, transaction.Hash)), nats.MsgId(transaction.Hash))
+		transferEvent := &minimalTxInfo{
+			Block:        transaction.Block.Number,
+			From:         transaction.From.Address,
+			To:           to.Hex(),
+			TokenAddress: transaction.To.Address,
+			TxHash:       transaction.Hash,
+			TxIndex:      transaction.Index,
+			Value:        value.Uint64(),
+		}
+
+		if transaction.Status == 1 {
+			transferEvent.Success = true
+		}
+
+		json, err := json.Marshal(transferEvent)
+		if err != nil {
+			return false, err
+		}
+
+		_, err = f.js.Publish("CHAIN.transfer", json, nats.MsgId(transaction.Hash))
 		if err != nil {
 			return false, err
 		}
@@ -64,7 +94,26 @@ func (f *DecodeFilter) Execute(_ context.Context, transaction fetch.Transaction)
 			return false, err
 		}
 
-		_, err := f.js.Publish("CHAIN.transferFrom", []byte(fmt.Sprintf("%d:%d:%s", transaction.Block.Number, transaction.Index, transaction.Hash)), nats.MsgId(transaction.Hash))
+		transferFromEvent := &minimalTxInfo{
+			Block:        transaction.Block.Number,
+			From:         from.Hex(),
+			To:           to.Hex(),
+			TokenAddress: transaction.To.Address,
+			TxHash:       transaction.Hash,
+			TxIndex:      transaction.Index,
+			Value:        value.Uint64(),
+		}
+
+		if transaction.Status == 1 {
+			transferFromEvent.Success = true
+		}
+
+		json, err := json.Marshal(transferFromEvent)
+		if err != nil {
+			return false, err
+		}
+
+		_, err = f.js.Publish("CHAIN.transferFrom", json, nats.MsgId(transaction.Hash))
 		if err != nil {
 			return false, err
 		}
@@ -80,7 +129,26 @@ func (f *DecodeFilter) Execute(_ context.Context, transaction fetch.Transaction)
 			return false, err
 		}
 
-		_, err := f.js.Publish("CHAIN.mintTo", []byte(fmt.Sprintf("%d:%d:%s", transaction.Block.Number, transaction.Index, transaction.Hash)), nats.MsgId(transaction.Hash))
+		mintToEvent := &minimalTxInfo{
+			Block:        transaction.Block.Number,
+			From:         transaction.From.Address,
+			To:           to.Hex(),
+			TokenAddress: transaction.To.Address,
+			TxHash:       transaction.Hash,
+			TxIndex:      transaction.Index,
+			Value:        value.Uint64(),
+		}
+
+		if transaction.Status == 1 {
+			mintToEvent.Success = true
+		}
+
+		json, err := json.Marshal(mintToEvent)
+		if err != nil {
+			return false, err
+		}
+
+		_, err = f.js.Publish("CHAIN.mintTo", json, nats.MsgId(transaction.Hash))
 		if err != nil {
 			return false, err
 		}

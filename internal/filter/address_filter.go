@@ -25,7 +25,7 @@ func NewAddressFilter(o AddressFilterOpts) Filter {
 	}
 }
 
-func (f *AddressFilter) Execute(_ context.Context, transaction fetch.Transaction) (bool, error) {
+func (f *AddressFilter) Execute(_ context.Context, transaction *fetch.Transaction) (bool, error) {
 	if _, found := f.cache.Load(transaction.To.Address); found {
 		return true, nil
 	}

@@ -94,6 +94,8 @@ func (j *Janitor) QueueMissingBlocks(ctx context.Context) error {
 		return err
 	}
 
+	j.logg.Info("janitor: missing blocks", "count", j.stats.GetHeadCursor()-lowerBound)
+
 	rowsProcessed := 0
 	for rows.Next() {
 		var blockNumber uint64
@@ -109,7 +111,7 @@ func (j *Janitor) QueueMissingBlocks(ctx context.Context) error {
 		rowsProcessed++
 	}
 
-	j.logg.Debug("janitor: missing blocks count", "count", rowsProcessed)
+	j.logg.Debug("janitor: missing blocks to be processed", "count", rowsProcessed)
 	if rowsProcessed == 0 {
 		j.logg.Info("janitor: no gap! rasing lower bound", "new_lower_bound", upperBound)
 		j.stats.UpdateLowerBound(upperBound)
