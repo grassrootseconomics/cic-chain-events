@@ -4,7 +4,7 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/grassrootseconomics/cic-chain-events/pkg/filter"
+	"github.com/grassrootseconomics/cic-chain-events/internal/filter"
 )
 
 func initAddressFilter() filter.Filter {

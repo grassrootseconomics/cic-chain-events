@@ -10,7 +10,7 @@ type Fetch interface {
 // Transaction reprsents a JSON object of all important mined transaction information
 type Transaction struct {
 	Block struct {
-		Number    uint   `json:"number"`
+		Number    uint64 `json:"number"`
 		Timestamp string `json:"timestamp"`
 	} `json:"block"`
 	Hash  string `json:"hash"`
@@ -23,8 +23,8 @@ type Transaction struct {
 	} `json:"to"`
 	Value     string `json:"value"`
 	InputData string `json:"inputData"`
-	Status    uint   `json:"status"`
-	GasUsed   uint   `json:"gasUsed"`
+	Status    uint64 `json:"status"`
+	GasUsed   uint64 `json:"gasUsed"`
 }
 
 // BlockResponse represents a full fetch JSON response

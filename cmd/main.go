@@ -13,7 +13,7 @@ import (
 	"github.com/grassrootseconomics/cic-chain-events/internal/pipeline"
 	"github.com/grassrootseconomics/cic-chain-events/internal/pool"
 	"github.com/grassrootseconomics/cic-chain-events/internal/syncer"
-	"github.com/grassrootseconomics/cic-chain-events/pkg/filter"
+	"github.com/grassrootseconomics/cic-chain-events/internal/filter"
 	"github.com/knadh/goyesql/v2"
 	"github.com/knadh/koanf"
 	"github.com/zerodha/logf"

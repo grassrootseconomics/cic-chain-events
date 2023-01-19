@@ -16,6 +16,9 @@ mod:
 test-pkg:
 	TEST_GRAPHQL_ENDPOINT=https://rpc.alfajores.celo.grassecon.net/graphql go test -v -covermode atomic -coverprofile=covprofile ./pkg/...
 
+bench-pkg:
+	TEST_RPC_ENDPOINT=https://rpc.alfajores.celo.grassecon.net TEST_GRAPHQL_ENDPOINT=https://rpc.alfajores.celo.grassecon.net/graphql go test -v -bench=. -run=^Benchmark ./pkg/...
+
 migrate:
 	tern migrate -c migrations/tern.conf
 
