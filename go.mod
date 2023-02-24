@@ -10,7 +10,7 @@ require (
 	github.com/grassrootseconomics/w3-celo-patch v0.1.0
 	github.com/jackc/pgx/v5 v5.2.0
 	github.com/knadh/goyesql/v2 v2.2.0
-	github.com/knadh/koanf v1.4.5
+	github.com/knadh/koanf v1.5.0
 	github.com/labstack/echo/v4 v4.9.0
 	github.com/nats-io/nats.go v1.23.0
 	github.com/stretchr/testify v1.8.1
