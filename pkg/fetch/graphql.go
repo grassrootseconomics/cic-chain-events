@@ -39,22 +39,22 @@ func (f *Graphql) Block(ctx context.Context, blockNumber uint64) (FetchResponse,
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, f.graphqlEndpoint, bytes.NewBufferString(fmt.Sprintf(graphqlQuery, blockNumber)))
 	if err != nil {
-		return FetchResponse{}, err
+		return nil, err
 	}
 	req.Header.Set("Content-Type", "application/json")
 
 	resp, err := f.httpClient.Do(req)
 	if err != nil {
-		return FetchResponse{}, err
+		return nil, err
 	}
 
 	if resp.StatusCode >= http.StatusBadRequest {
-		return FetchResponse{}, fmt.Errorf("error fetching block %s", resp.Status)
+		return nil, fmt.Errorf("error fetching block %s", resp.Status)
 	}
 	defer resp.Body.Close()
 
 	if err := json.NewDecoder(resp.Body).Decode(&fetchResponse); err != nil {
-		return FetchResponse{}, err
+		return nil, err
 	}
 
 	return fetchResponse, nil
