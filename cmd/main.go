@@ -10,10 +10,10 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/grassrootseconomics/cic-chain-events/internal/filter"
 	"github.com/grassrootseconomics/cic-chain-events/internal/pipeline"
 	"github.com/grassrootseconomics/cic-chain-events/internal/pool"
 	"github.com/grassrootseconomics/cic-chain-events/internal/syncer"
-	"github.com/grassrootseconomics/cic-chain-events/internal/filter"
 	"github.com/knadh/goyesql/v2"
 	"github.com/knadh/koanf"
 	"github.com/zerodha/logf"
@@ -58,13 +58,20 @@ func main() {
 		lo.Fatal("main: critical error loading pg store", "error", err)
 	}
 
+	jsCtx, err := initJetStream()
+	if err != nil {
+		lo.Fatal("main: critical error loading jetstream context", "error", err)
+	}
+
 	graphqlFetcher := initFetcher()
 
 	pipeline := pipeline.NewPipeline(pipeline.PipelineOpts{
 		BlockFetcher: graphqlFetcher,
 		Filters: []filter.Filter{
 			initAddressFilter(),
-			initDecodeFilter(),
+			initGasGiftFilter(jsCtx),
+			initTransferFilter(jsCtx),
+			initRegisterFilter(jsCtx),
 		},
 		Logg:  lo,
 		Store: pgStore,

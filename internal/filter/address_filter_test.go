@@ -7,7 +7,6 @@ import (
 
 	"github.com/grassrootseconomics/cic-chain-events/pkg/fetch"
 	"github.com/stretchr/testify/suite"
-	"github.com/zerodha/logf"
 )
 
 type AddressFilterSuite struct {
@@ -20,15 +19,8 @@ func (s *AddressFilterSuite) SetupSuite() {
 
 	addressCache.Store("0x6914ba1c49d3c3f32a9e65a0661d7656cb292e9f", "")
 
-	logg := logf.New(
-		logf.Opts{
-			Level: logf.DebugLevel,
-		},
-	)
-
 	s.filter = NewAddressFilter(AddressFilterOpts{
 		Cache: addressCache,
-		Logg:  logg,
 	})
 }
 
@@ -66,7 +58,7 @@ func (s *AddressFilterSuite) TestAddresses() {
 	}
 
 	for _, test := range tests {
-		next, err := s.filter.Execute(context.Background(), &test.transactionData)
+		next, err := s.filter.Execute(context.Background(), test.transactionData)
 		s.NoError(err)
 		s.Equal(test.want, next)
 	}

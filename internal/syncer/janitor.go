@@ -48,20 +48,18 @@ func NewJanitor(o JanitorOpts) *Janitor {
 }
 
 func (j *Janitor) Start(ctx context.Context) error {
-	timer := time.NewTimer(j.sweepInterval)
+	ticker := time.NewTicker(j.sweepInterval)
 
 	for {
 		select {
 		case <-ctx.Done():
 			j.logg.Info("janitor: shutdown signal received")
 			return nil
-		case <-timer.C:
+		case <-ticker.C:
 			j.logg.Debug("janitor: starting sweep")
 			if err := j.QueueMissingBlocks(context.Background()); err != nil {
 				j.logg.Error("janitor: queue missing blocks error", "error", err)
 			}
-
-			timer.Reset(j.sweepInterval)
 		}
 	}
 }
