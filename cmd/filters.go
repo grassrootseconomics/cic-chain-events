@@ -5,6 +5,7 @@ import (
 	"sync"
 
 	"github.com/grassrootseconomics/cic-chain-events/internal/filter"
+	"github.com/nats-io/nats.go"
 )
 
 func initAddressFilter() filter.Filter {
@@ -13,9 +14,8 @@ func initAddressFilter() filter.Filter {
 	cache := &sync.Map{}
 
 	// Example bootstrap addresses
-	cache.Store(strings.ToLower("0x617f3112bf5397D0467D315cC709EF968D9ba546"), "USDT")
-	cache.Store(strings.ToLower("0x765DE816845861e75A25fCA122bb6898B8B1282a"), "cUSD")
-	cache.Store(strings.ToLower("0xD8763CBa276a3738E6DE85b4b3bF5FDed6D6cA73"), "cEUR")
+	cache.Store(strings.ToLower("0x54c8D8718Ea9E7b2b4542e630fd36Ccab32cE74E"), "BABVoucher")
+	cache.Store(strings.ToLower("0xdD4F5ea484F6b16f031eF7B98F3810365493BC20"), "GasFaucet")
 
 	return filter.NewAddressFilter(filter.AddressFilterOpts{
 		Cache: cache,
@@ -23,14 +23,17 @@ func initAddressFilter() filter.Filter {
 	})
 }
 
-func initDecodeFilter() filter.Filter {
-	js, err := initJetStream()
-	if err != nil {
-		lo.Fatal("filters: critical error loading jetstream", "error", err)
-	}
-
-	return filter.NewDecodeFilter(filter.DecodeFilterOpts{
+func initTransferFilter(jsCtx nats.JetStreamContext) filter.Filter {
+	return filter.NewTransferFilter(filter.TransferFilterOpts{
 		Logg:  lo,
-		JSCtx: js,
+		JSCtx: jsCtx,
+	})
+
+}
+
+func initGasGiftFilter(jsCtx nats.JetStreamContext) filter.Filter {
+	return filter.NewGasFilter(filter.GasFilterOpts{
+		Logg:  lo,
+		JSCtx: jsCtx,
 	})
 }

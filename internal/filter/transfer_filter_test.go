@@ -9,24 +9,24 @@ import (
 	"github.com/zerodha/logf"
 )
 
-type DecodeFilterSuite struct {
+type TransferFilterSuite struct {
 	suite.Suite
 	filter Filter
 }
 
-func (s *DecodeFilterSuite) SetupSuite() {
+func (s *TransferFilterSuite) SetupSuite() {
 	logg := logf.New(
 		logf.Opts{
 			Level: logf.DebugLevel,
 		},
 	)
 
-	s.filter = NewDecodeFilter(DecodeFilterOpts{
+	s.filter = NewTransferFilter(TransferFilterOpts{
 		Logg: logg,
 	})
 }
 
-func (s *DecodeFilterSuite) TestTranfserInputs() {
+func (s *TransferFilterSuite) TestTranfserInputs() {
 	type testCase struct {
 		transactionData fetch.Transaction
 		want            bool
@@ -72,6 +72,6 @@ func (s *DecodeFilterSuite) TestTranfserInputs() {
 	}
 }
 
-func TestDecodeFilterSuite(t *testing.T) {
-	suite.Run(t, new(DecodeFilterSuite))
+func TestTransferFilterSuite(t *testing.T) {
+	suite.Run(t, new(TransferFilterSuite))
 }

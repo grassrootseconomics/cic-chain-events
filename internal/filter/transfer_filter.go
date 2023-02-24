@@ -18,12 +18,12 @@ var (
 	mintToSig       = w3.MustNewFunc("mintTo(address, uint256)", "bool")
 )
 
-type DecodeFilterOpts struct {
+type TransferFilterOpts struct {
 	Logg  logf.Logger
 	JSCtx nats.JetStreamContext
 }
 
-type DecodeFilter struct {
+type TransferFilter struct {
 	logg logf.Logger
 	js   nats.JetStreamContext
 }
@@ -39,14 +39,14 @@ type minimalTxInfo struct {
 	Value        uint64 `json:"value"`
 }
 
-func NewDecodeFilter(o DecodeFilterOpts) Filter {
-	return &DecodeFilter{
+func NewTransferFilter(o TransferFilterOpts) Filter {
+	return &TransferFilter{
 		logg: o.Logg,
 		js:   o.JSCtx,
 	}
 }
 
-func (f *DecodeFilter) Execute(_ context.Context, transaction *fetch.Transaction) (bool, error) {
+func (f *TransferFilter) Execute(_ context.Context, transaction *fetch.Transaction) (bool, error) {
 	switch transaction.InputData[:10] {
 	case "0xa9059cbb":
 		var (
@@ -155,7 +155,7 @@ func (f *DecodeFilter) Execute(_ context.Context, transaction *fetch.Transaction
 
 		return true, nil
 	default:
-		f.logg.Debug("unknownSignature", "inpuData", transaction.InputData)
-		return false, nil
+		// Skip and continue to next filter
+		return true, nil
 	}
 }
