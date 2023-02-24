@@ -4,7 +4,7 @@ go 1.19
 
 require (
 	github.com/VictoriaMetrics/metrics v1.23.1
-	github.com/alitto/pond v1.8.2
+	github.com/alitto/pond v1.8.3
 	github.com/celo-org/celo-blockchain v1.6.1
 	github.com/goccy/go-json v0.10.0
 	github.com/grassrootseconomics/w3-celo-patch v0.1.0
