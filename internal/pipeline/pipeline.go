@@ -49,7 +49,7 @@ func (md *Pipeline) Run(ctx context.Context, blockNumber uint64) error {
 
 	for _, tx := range fetchResp.Data.Block.Transactions {
 		for _, filter := range md.filters {
-			next, err := filter.Execute(ctx, &tx)
+			next, err := filter.Execute(ctx, tx)
 			if err != nil {
 				return err
 			}

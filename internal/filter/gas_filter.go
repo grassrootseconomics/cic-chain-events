@@ -40,7 +40,7 @@ func NewGasFilter(o GasFilterOpts) Filter {
 	}
 }
 
-func (f *GasFilter) Execute(_ context.Context, transaction *fetch.Transaction) (bool, error) {
+func (f *GasFilter) Execute(_ context.Context, transaction fetch.Transaction) (bool, error) {
 	switch transaction.InputData[:10] {
 	case "0x63e4bff4":
 		var (
