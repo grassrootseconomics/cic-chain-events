@@ -69,8 +69,9 @@ func main() {
 		BlockFetcher: graphqlFetcher,
 		Filters: []filter.Filter{
 			initAddressFilter(),
-			initTransferFilter(jsCtx),
 			initGasGiftFilter(jsCtx),
+			initTransferFilter(jsCtx),
+			initRegisterFilter(jsCtx),
 		},
 		Logg:  lo,
 		Store: pgStore,

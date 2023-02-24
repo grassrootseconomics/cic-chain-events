@@ -2,14 +2,17 @@ package filter
 
 import (
 	"context"
-	"encoding/json"
 	"math/big"
 
 	"github.com/celo-org/celo-blockchain/common"
+	"github.com/grassrootseconomics/cic-chain-events/internal/events"
 	"github.com/grassrootseconomics/cic-chain-events/pkg/fetch"
 	"github.com/grassrootseconomics/w3-celo-patch"
-	"github.com/nats-io/nats.go"
 	"github.com/zerodha/logf"
+)
+
+const (
+	transferFilterEventSubject = "CHAIN.transfer"
 )
 
 var (
@@ -19,34 +22,27 @@ var (
 )
 
 type TransferFilterOpts struct {
-	Logg  logf.Logger
-	JSCtx nats.JetStreamContext
+	EventEmitter events.EventEmitter
+	Logg         logf.Logger
 }
 
 type TransferFilter struct {
-	logg logf.Logger
-	js   nats.JetStreamContext
-}
-
-type minimalTxInfo struct {
-	Block        uint64 `json:"block"`
-	From         string `json:"from"`
-	Success      bool   `json:"success"`
-	To           string `json:"to"`
-	TokenAddress string `json:"tokenAddress"`
-	TxHash       string `json:"transactionHash"`
-	TxIndex      uint   `json:"transactionIndex"`
-	Value        uint64 `json:"value"`
+	eventEmitter events.EventEmitter
+	logg         logf.Logger
 }
 
 func NewTransferFilter(o TransferFilterOpts) Filter {
 	return &TransferFilter{
-		logg: o.Logg,
-		js:   o.JSCtx,
+		eventEmitter: o.EventEmitter,
+		logg:         o.Logg,
 	}
 }
 
 func (f *TransferFilter) Execute(_ context.Context, transaction fetch.Transaction) (bool, error) {
+	if len(transaction.InputData) < 10 {
+		return true, nil
+	}
+
 	switch transaction.InputData[:10] {
 	case "0xa9059cbb":
 		var (
@@ -58,27 +54,27 @@ func (f *TransferFilter) Execute(_ context.Context, transaction fetch.Transactio
 			return false, err
 		}
 
-		transferEvent := &minimalTxInfo{
-			Block:        transaction.Block.Number,
-			From:         transaction.From.Address,
-			To:           to.Hex(),
-			TokenAddress: transaction.To.Address,
-			TxHash:       transaction.Hash,
-			TxIndex:      transaction.Index,
-			Value:        value.Uint64(),
+		f.logg.Debug("transfer_filter: new reg", "transfer", to)
+
+		transferEvent := &events.MinimalTxInfo{
+			Block:           transaction.Block.Number,
+			From:            transaction.From.Address,
+			To:              to.Hex(),
+			ContractAddress: transaction.To.Address,
+			TxHash:          transaction.Hash,
+			TxIndex:         transaction.Index,
+			Value:           value.Uint64(),
 		}
 
 		if transaction.Status == 1 {
 			transferEvent.Success = true
 		}
 
-		json, err := json.Marshal(transferEvent)
-		if err != nil {
-			return false, err
-		}
-
-		_, err = f.js.Publish("CHAIN.transfer", json, nats.MsgId(transaction.Hash))
-		if err != nil {
+		if err := f.eventEmitter.Publish(
+			transferFilterEventSubject,
+			transaction.Hash,
+			transferEvent,
+		); err != nil {
 			return false, err
 		}
 
@@ -94,27 +90,27 @@ func (f *TransferFilter) Execute(_ context.Context, transaction fetch.Transactio
 			return false, err
 		}
 
-		transferFromEvent := &minimalTxInfo{
-			Block:        transaction.Block.Number,
-			From:         from.Hex(),
-			To:           to.Hex(),
-			TokenAddress: transaction.To.Address,
-			TxHash:       transaction.Hash,
-			TxIndex:      transaction.Index,
-			Value:        value.Uint64(),
+		f.logg.Debug("transfer_filter: new reg", "transferFrom", to)
+
+		transferEvent := &events.MinimalTxInfo{
+			Block:           transaction.Block.Number,
+			From:            from.Hex(),
+			To:              to.Hex(),
+			ContractAddress: transaction.To.Address,
+			TxHash:          transaction.Hash,
+			TxIndex:         transaction.Index,
+			Value:           value.Uint64(),
 		}
 
 		if transaction.Status == 1 {
-			transferFromEvent.Success = true
+			transferEvent.Success = true
 		}
 
-		json, err := json.Marshal(transferFromEvent)
-		if err != nil {
-			return false, err
-		}
-
-		_, err = f.js.Publish("CHAIN.transferFrom", json, nats.MsgId(transaction.Hash))
-		if err != nil {
+		if err := f.eventEmitter.Publish(
+			transferFilterEventSubject,
+			transaction.Hash,
+			transferEvent,
+		); err != nil {
 			return false, err
 		}
 
@@ -129,33 +125,32 @@ func (f *TransferFilter) Execute(_ context.Context, transaction fetch.Transactio
 			return false, err
 		}
 
-		mintToEvent := &minimalTxInfo{
-			Block:        transaction.Block.Number,
-			From:         transaction.From.Address,
-			To:           to.Hex(),
-			TokenAddress: transaction.To.Address,
-			TxHash:       transaction.Hash,
-			TxIndex:      transaction.Index,
-			Value:        value.Uint64(),
+		f.logg.Debug("transfer_filter: new reg", "mintTo", to)
+
+		transferEvent := &events.MinimalTxInfo{
+			Block:           transaction.Block.Number,
+			From:            transaction.From.Address,
+			To:              to.Hex(),
+			ContractAddress: transaction.To.Address,
+			TxHash:          transaction.Hash,
+			TxIndex:         transaction.Index,
+			Value:           value.Uint64(),
 		}
 
 		if transaction.Status == 1 {
-			mintToEvent.Success = true
+			transferEvent.Success = true
 		}
 
-		json, err := json.Marshal(mintToEvent)
-		if err != nil {
-			return false, err
-		}
-
-		_, err = f.js.Publish("CHAIN.mintTo", json, nats.MsgId(transaction.Hash))
-		if err != nil {
+		if err := f.eventEmitter.Publish(
+			transferFilterEventSubject,
+			transaction.Hash,
+			transferEvent,
+		); err != nil {
 			return false, err
 		}
 
 		return true, nil
 	default:
-		// Skip and continue to next filter
 		return true, nil
 	}
 }

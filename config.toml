@@ -1,43 +1,35 @@
 [metrics]
 # Exposes Prometheus metrics
-# /metrics endpoint
 go_process = true
 
 # API server
 [api]
 # Host and port
-address = ":8080"
+address = ":8085"
 
 # Geth API endpoints
 [chain]
-graphql_endpoint = "https://rpc.celo.grassecon.net/graphql"
-ws_endpoint      = "wss://socket.celo.grassecon.net"
+graphql_endpoint = "https://rpc.alfajores.celo.grassecon.net/graphql"
+ws_endpoint      = "wss://ws.alfajores.celo.grassecon.net"
 
+# Syncer configs
 [syncer]
-# Number of goroutines assigned to the janitor worker pool
+# Maximum number of missing blocks pushed into the worker queue every janitor sweep
+janitor_queue_size     = 500
+# Number of goroutines assigned to the worker pool
 janitor_concurrency    = 5
 # Syncer start block
-initial_lower_bound    = 17269000
-# Max blocks in worker queue awaiting processing
-janitor_queue_size     = 500
-# Janitor sweep interval
+initial_lower_bound    = 16373156
+# Janitor sweep interval, should take into account concurrency and queue_size
 janitor_sweep_interval = 5
 
 [postgres]
-# Default is the Docker container DSN
 dsn   = "postgres://postgres:postgres@localhost:5432/cic_chain_events"
 
 # https://docs.nats.io/
 [jetstream]
 endpoint               = "nats://localhost:4222"
-stream_name            = "CHAIN"
-# Duration JetStream should keep the message before remocing it from the persistent store
+# Duration JetStream should keep the message before GC
 persist_duration_hours = 48
 # Duration to ignore duplicate transactions (e.g. due to restart)
 dedup_duration_hours   = 6
-# Stream subjects
-stream_subjects        = [
-    "CHAIN.transfer",
-    "CHAIN.transferFrom",
-    "CHAIN.mintTo"
-]

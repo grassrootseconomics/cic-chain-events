@@ -2,78 +2,67 @@ package filter
 
 import (
 	"context"
-	"encoding/json"
 
-	"github.com/celo-org/celo-blockchain/common"
+	"github.com/celo-org/celo-blockchain/common/hexutil"
+	"github.com/grassrootseconomics/cic-chain-events/internal/events"
 	"github.com/grassrootseconomics/cic-chain-events/pkg/fetch"
-	"github.com/grassrootseconomics/w3-celo-patch"
-	"github.com/nats-io/nats.go"
 	"github.com/zerodha/logf"
 )
 
-var (
-	giveToSig = w3.MustNewFunc("giveTo(address)", "uint256")
+const (
+	gasFilterEventSubject = "CHAIN.gas"
 )
 
 type GasFilterOpts struct {
-	Logg  logf.Logger
-	JSCtx nats.JetStreamContext
+	EventEmitter  events.EventEmitter
+	Logg          logf.Logger
+	SystemAddress string
 }
 
 type GasFilter struct {
-	logg logf.Logger
-	js   nats.JetStreamContext
-}
-
-type minimalGasGiftTxInfo struct {
-	Block   uint64 `json:"block"`
-	Success bool   `json:"success"`
-	To      string `json:"to"`
-	TxHash  string `json:"transactionHash"`
-	TxIndex uint   `json:"transactionIndex"`
+	eventEmitter  events.EventEmitter
+	logg          logf.Logger
+	systemAddress string
 }
 
 func NewGasFilter(o GasFilterOpts) Filter {
 	return &GasFilter{
-		logg: o.Logg,
-		js:   o.JSCtx,
+		eventEmitter:  o.EventEmitter,
+		logg:          o.Logg,
+		systemAddress: o.SystemAddress,
 	}
 }
 
 func (f *GasFilter) Execute(_ context.Context, transaction fetch.Transaction) (bool, error) {
-	switch transaction.InputData[:10] {
-	case "0x63e4bff4":
-		var (
-			to common.Address
-		)
+	transferValue, err := hexutil.DecodeUint64(transaction.Value)
+	if err != nil {
+		return false, err
+	}
 
-		if err := giveToSig.DecodeArgs(w3.B(transaction.InputData), &to); err != nil {
-			return false, err
-		}
-
-		transferEvent := &minimalGasGiftTxInfo{
+	// TODO: This is a temporary shortcut to gift gas. Switch to gas faucet contract.
+	if transaction.From.Address == f.systemAddress && transferValue > 0 {
+		transferEvent := &events.MinimalTxInfo{
 			Block:   transaction.Block.Number,
-			To:      to.Hex(),
+			To:      transaction.To.Address,
 			TxHash:  transaction.Hash,
 			TxIndex: transaction.Index,
+			Value:   transferValue,
 		}
 
 		if transaction.Status == 1 {
 			transferEvent.Success = true
 		}
 
-		json, err := json.Marshal(transferEvent)
-		if err != nil {
-			return false, err
-		}
-
-		_, err = f.js.Publish("CHAIN.gasGiveTo", json, nats.MsgId(transaction.Hash))
-		if err != nil {
+		if err := f.eventEmitter.Publish(
+			gasFilterEventSubject,
+			transaction.Hash,
+			transferEvent,
+		); err != nil {
 			return false, err
 		}
 
 		return true, nil
-	default:
-		return false, nil
 	}
+
+	return true, nil
 }
