@@ -4,8 +4,8 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/grassrootseconomics/cic-chain-events/internal/events"
 	"github.com/grassrootseconomics/cic-chain-events/internal/filter"
+	"github.com/grassrootseconomics/cic-chain-events/internal/pub"
 )
 
 var (
@@ -29,25 +29,25 @@ func initAddressFilter() filter.Filter {
 	})
 }
 
-func initTransferFilter(eventEmitter events.EventEmitter) filter.Filter {
+func initTransferFilter(pub *pub.Pub) filter.Filter {
 	return filter.NewTransferFilter(filter.TransferFilterOpts{
-		EventEmitter: eventEmitter,
-		Logg:         lo,
+		Pub:  pub,
+		Logg: lo,
 	})
 
 }
 
-func initGasGiftFilter(eventEmitter events.EventEmitter) filter.Filter {
+func initGasGiftFilter(pub *pub.Pub) filter.Filter {
 	return filter.NewGasFilter(filter.GasFilterOpts{
-		EventEmitter:  eventEmitter,
+		Pub:           pub,
 		Logg:          lo,
 		SystemAddress: systemAddress,
 	})
 }
 
-func initRegisterFilter(eventEmitter events.EventEmitter) filter.Filter {
+func initRegisterFilter(pub *pub.Pub) filter.Filter {
 	return filter.NewRegisterFilter(filter.RegisterFilterOpts{
-		EventEmitter: eventEmitter,
-		Logg:         lo,
+		Pub:  pub,
+		Logg: lo,
 	})
 }

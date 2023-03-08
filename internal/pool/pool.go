@@ -7,6 +7,10 @@ import (
 	"github.com/alitto/pond"
 )
 
+const (
+	idleTimeout = 1 * time.Second
+)
+
 type Opts struct {
 	Concurrency int
 	QueueSize   int
@@ -18,7 +22,7 @@ func NewPool(ctx context.Context, o Opts) *pond.WorkerPool {
 		o.Concurrency,
 		o.QueueSize,
 		pond.MinWorkers(o.Concurrency),
-		pond.IdleTimeout(time.Second*1),
+		pond.IdleTimeout(idleTimeout),
 		pond.Context(ctx),
 	)
 }

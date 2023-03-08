@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/celo-org/celo-blockchain/common"
-	"github.com/grassrootseconomics/cic-chain-events/internal/events"
+	"github.com/grassrootseconomics/cic-chain-events/internal/pub"
 	"github.com/grassrootseconomics/cic-chain-events/pkg/fetch"
 	"github.com/grassrootseconomics/w3-celo-patch"
 	"github.com/zerodha/logf"
@@ -18,20 +18,22 @@ var (
 	addSig = w3.MustNewFunc("add(address)", "bool")
 )
 
-type RegisterFilterOpts struct {
-	EventEmitter events.EventEmitter
-	Logg         logf.Logger
-}
+type (
+	RegisterFilterOpts struct {
+		Logg logf.Logger
+		Pub  *pub.Pub
+	}
 
-type RegisterFilter struct {
-	eventEmitter events.EventEmitter
-	logg         logf.Logger
-}
+	RegisterFilter struct {
+		logg logf.Logger
+		pub  *pub.Pub
+	}
+)
 
 func NewRegisterFilter(o RegisterFilterOpts) Filter {
 	return &RegisterFilter{
-		eventEmitter: o.EventEmitter,
-		logg:         o.Logg,
+		logg: o.Logg,
+		pub:  o.Pub,
 	}
 }
 
@@ -47,7 +49,7 @@ func (f *RegisterFilter) Execute(_ context.Context, transaction fetch.Transactio
 			return false, err
 		}
 
-		addEvent := &events.MinimalTxInfo{
+		addEvent := &pub.MinimalTxInfo{
 			Block:           transaction.Block.Number,
 			ContractAddress: transaction.To.Address,
 			To:              transaction.To.Address,
@@ -59,7 +61,7 @@ func (f *RegisterFilter) Execute(_ context.Context, transaction fetch.Transactio
 			addEvent.Success = true
 		}
 
-		if err := f.eventEmitter.Publish(
+		if err := f.pub.Publish(
 			registerEventSubject,
 			transaction.Hash,
 			addEvent,
@@ -69,6 +71,6 @@ func (f *RegisterFilter) Execute(_ context.Context, transaction fetch.Transactio
 
 		return true, nil
 	}
-	
+
 	return true, nil
 }

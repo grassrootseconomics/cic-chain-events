@@ -3,27 +3,37 @@ package store
 import (
 	"context"
 	"fmt"
+	"os"
+	"time"
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/jackc/tern/v2/migrate"
 	"github.com/knadh/goyesql/v2"
 	"github.com/zerodha/logf"
 )
 
-type queries struct {
-	CommitBlock         string `query:"commit-block"`
-	GetMissingBlocks    string `query:"get-missing-blocks"`
-	GetSearchBounds     string `query:"get-search-bounds"`
-	InitSyncerMeta      string `query:"init-syncer-meta"`
-	SetSearchLowerBound string `query:"set-search-lower-bound"`
-}
+const (
+	schemaTable = "schema_version"
+)
 
-type PostgresStoreOpts struct {
-	DSN               string
-	InitialLowerBound uint64
-	Logg              logf.Logger
-	Queries           goyesql.Queries
-}
+type (
+	queries struct {
+		CommitBlock         string `query:"commit-block"`
+		GetMissingBlocks    string `query:"get-missing-blocks"`
+		GetSearchBounds     string `query:"get-search-bounds"`
+		InitSyncerMeta      string `query:"init-syncer-meta"`
+		SetSearchLowerBound string `query:"set-search-lower-bound"`
+	}
+
+	PostgresStoreOpts struct {
+		DSN                  string
+		MigrationsFolderPath string
+		InitialLowerBound    uint64
+		Logg                 logf.Logger
+		Queries              goyesql.Queries
+	}
+)
 
 type PostgresStore struct {
 	logg    logf.Logger
@@ -45,12 +55,34 @@ func NewPostgresStore(o PostgresStoreOpts) (Store[pgx.Rows], error) {
 		return nil, err
 	}
 
-	dbPool, err := pgxpool.NewWithConfig(context.Background(), parsedConfig)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	dbPool, err := pgxpool.NewWithConfig(ctx, parsedConfig)
 	if err != nil {
 		return nil, err
 	}
 
-	_, err = dbPool.Exec(context.Background(), postgresStore.queries.InitSyncerMeta, o.InitialLowerBound)
+	conn, err := dbPool.Acquire(ctx)
+	if err != nil {
+		return nil, err
+	}
+	defer conn.Release()
+
+	migrator, err := migrate.NewMigrator(ctx, conn.Conn(), schemaTable)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := migrator.LoadMigrations(os.DirFS(o.MigrationsFolderPath)); err != nil {
+		return nil, err
+	}
+
+	if err := migrator.Migrate(ctx); err != nil {
+		return nil, err
+	}
+
+	_, err = dbPool.Exec(ctx, postgresStore.queries.InitSyncerMeta, o.InitialLowerBound)
 	if err != nil {
 		return nil, err
 	}

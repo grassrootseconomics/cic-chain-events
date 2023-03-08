@@ -8,9 +8,9 @@ builds:
       - linux
     goarch:
       - amd64
-    main: ./cmd
+    main: ./cmd/service
     ldflags:
-      - -s -w
+      - -X main.build={{.ShortCommit}} -s -w
 
 archives:
   - format: tar.gz

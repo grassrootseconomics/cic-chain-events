@@ -1,25 +1,33 @@
-FROM golang:1.19-bullseye as build
+FROM golang:1-bullseye as build
+
+ENV CGO_ENABLED=1
+ENV GOOS=linux
+ENV GOARCH=amd64
+
+ENV BUILD_COMMIT=${BUILD_COMMIT}
 
 WORKDIR /build
+
+COPY go.* .
+RUN go mod download
+
 COPY . .
-RUN CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -o cic-chain-events -ldflags="-s -w" cmd/*.go
+RUN go build -o cic-chain-events -ldflags="-X main.build=${BUILD_COMMIT} -s -w" cmd/service/*
+
 
 FROM debian:bullseye-slim
 
 ENV DEBIAN_FRONTEND=noninteractive
-RUN set -x && \
-    apt-get update && \
-    apt-get install -y ca-certificates && \
-    rm -rf /var/cache/apt/archives /var/lib/apt/lists/*
 
 WORKDIR /service
 
+COPY --from=build /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 COPY --from=build /build/cic-chain-events .
+COPY migrations migrations/
 COPY config.toml .
 COPY queries.sql .
 COPY LICENSE .
-COPY migrations migrations/
+
+EXPOSE 5000
 
 CMD ["./cic-chain-events"]
-
-EXPOSE 8080

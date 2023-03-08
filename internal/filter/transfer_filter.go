@@ -5,7 +5,7 @@ import (
 	"math/big"
 
 	"github.com/celo-org/celo-blockchain/common"
-	"github.com/grassrootseconomics/cic-chain-events/internal/events"
+	"github.com/grassrootseconomics/cic-chain-events/internal/pub"
 	"github.com/grassrootseconomics/cic-chain-events/pkg/fetch"
 	"github.com/grassrootseconomics/w3-celo-patch"
 	"github.com/zerodha/logf"
@@ -21,20 +21,22 @@ var (
 	mintToSig       = w3.MustNewFunc("mintTo(address, uint256)", "bool")
 )
 
-type TransferFilterOpts struct {
-	EventEmitter events.EventEmitter
-	Logg         logf.Logger
-}
+type (
+	TransferFilterOpts struct {
+		Logg logf.Logger
+		Pub  *pub.Pub
+	}
 
-type TransferFilter struct {
-	eventEmitter events.EventEmitter
-	logg         logf.Logger
-}
+	TransferFilter struct {
+		logg logf.Logger
+		pub  *pub.Pub
+	}
+)
 
 func NewTransferFilter(o TransferFilterOpts) Filter {
 	return &TransferFilter{
-		eventEmitter: o.EventEmitter,
-		logg:         o.Logg,
+		logg: o.Logg,
+		pub:  o.Pub,
 	}
 }
 
@@ -56,7 +58,7 @@ func (f *TransferFilter) Execute(_ context.Context, transaction fetch.Transactio
 
 		f.logg.Debug("transfer_filter: new reg", "transfer", to)
 
-		transferEvent := &events.MinimalTxInfo{
+		transferEvent := &pub.MinimalTxInfo{
 			Block:           transaction.Block.Number,
 			From:            transaction.From.Address,
 			To:              to.Hex(),
@@ -70,7 +72,7 @@ func (f *TransferFilter) Execute(_ context.Context, transaction fetch.Transactio
 			transferEvent.Success = true
 		}
 
-		if err := f.eventEmitter.Publish(
+		if err := f.pub.Publish(
 			transferFilterEventSubject,
 			transaction.Hash,
 			transferEvent,
@@ -92,7 +94,7 @@ func (f *TransferFilter) Execute(_ context.Context, transaction fetch.Transactio
 
 		f.logg.Debug("transfer_filter: new reg", "transferFrom", to)
 
-		transferEvent := &events.MinimalTxInfo{
+		transferEvent := &pub.MinimalTxInfo{
 			Block:           transaction.Block.Number,
 			From:            from.Hex(),
 			To:              to.Hex(),
@@ -106,7 +108,7 @@ func (f *TransferFilter) Execute(_ context.Context, transaction fetch.Transactio
 			transferEvent.Success = true
 		}
 
-		if err := f.eventEmitter.Publish(
+		if err := f.pub.Publish(
 			transferFilterEventSubject,
 			transaction.Hash,
 			transferEvent,
@@ -127,7 +129,7 @@ func (f *TransferFilter) Execute(_ context.Context, transaction fetch.Transactio
 
 		f.logg.Debug("transfer_filter: new reg", "mintTo", to)
 
-		transferEvent := &events.MinimalTxInfo{
+		transferEvent := &pub.MinimalTxInfo{
 			Block:           transaction.Block.Number,
 			From:            transaction.From.Address,
 			To:              to.Hex(),
@@ -141,7 +143,7 @@ func (f *TransferFilter) Execute(_ context.Context, transaction fetch.Transactio
 			transferEvent.Success = true
 		}
 
-		if err := f.eventEmitter.Publish(
+		if err := f.pub.Publish(
 			transferFilterEventSubject,
 			transaction.Hash,
 			transferEvent,

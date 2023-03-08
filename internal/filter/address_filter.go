@@ -8,17 +8,19 @@ import (
 	"github.com/zerodha/logf"
 )
 
-type AddressFilterOpts struct {
-	Cache         *sync.Map
-	Logg          logf.Logger
-	SystemAddress string
-}
+type (
+	AddressFilterOpts struct {
+		Cache         *sync.Map
+		Logg          logf.Logger
+		SystemAddress string
+	}
 
-type AddressFilter struct {
-	cache         *sync.Map
-	logg          logf.Logger
-	systemAddress string
-}
+	AddressFilter struct {
+		cache         *sync.Map
+		logg          logf.Logger
+		systemAddress string
+	}
+)
 
 func NewAddressFilter(o AddressFilterOpts) Filter {
 	return &AddressFilter{

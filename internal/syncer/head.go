@@ -2,6 +2,7 @@ package syncer
 
 import (
 	"context"
+	"time"
 
 	"github.com/alitto/pond"
 	"github.com/celo-org/celo-blockchain/core/types"
@@ -10,21 +11,27 @@ import (
 	"github.com/zerodha/logf"
 )
 
-type HeadSyncerOpts struct {
-	Stats      *Stats
-	Pipeline   *pipeline.Pipeline
-	Logg       logf.Logger
-	Pool       *pond.WorkerPool
-	WsEndpoint string
-}
+const (
+	jobTimeout = 5 * time.Second
+)
 
-type HeadSyncer struct {
-	stats     *Stats
-	pipeline  *pipeline.Pipeline
-	logg      logf.Logger
-	ethClient *ethclient.Client
-	pool      *pond.WorkerPool
-}
+type (
+	HeadSyncerOpts struct {
+		Logg       logf.Logger
+		Pipeline   *pipeline.Pipeline
+		Pool       *pond.WorkerPool
+		Stats      *Stats
+		WsEndpoint string
+	}
+
+	HeadSyncer struct {
+		ethClient *ethclient.Client
+		logg      logf.Logger
+		pipeline  *pipeline.Pipeline
+		pool      *pond.WorkerPool
+		stats     *Stats
+	}
+)
 
 func NewHeadSyncer(o HeadSyncerOpts) (*HeadSyncer, error) {
 	ethClient, err := ethclient.Dial(o.WsEndpoint)
@@ -33,11 +40,11 @@ func NewHeadSyncer(o HeadSyncerOpts) (*HeadSyncer, error) {
 	}
 
 	return &HeadSyncer{
-		stats:     o.Stats,
-		pipeline:  o.Pipeline,
-		logg:      o.Logg,
 		ethClient: ethClient,
+		logg:      o.Logg,
+		pipeline:  o.Pipeline,
 		pool:      o.Pool,
+		stats:     o.Stats,
 	}, nil
 }
 
@@ -46,7 +53,7 @@ func NewHeadSyncer(o HeadSyncerOpts) (*HeadSyncer, error) {
 func (hs *HeadSyncer) Start(ctx context.Context) error {
 	headerReceiver := make(chan *types.Header, 1)
 
-	sub, err := hs.ethClient.SubscribeNewHead(ctx, headerReceiver)
+	sub, err := hs.ethClient.SubscribeNewHead(context.Background(), headerReceiver)
 	if err != nil {
 		return err
 	}
@@ -62,10 +69,12 @@ func (hs *HeadSyncer) Start(ctx context.Context) error {
 		case header := <-headerReceiver:
 			blockNumber := header.Number.Uint64()
 			hs.logg.Debug("head syncer: received new block", "block", blockNumber)
-
 			hs.stats.UpdateHeadCursor(blockNumber)
 			hs.pool.Submit(func() {
-				if err := hs.pipeline.Run(context.Background(), blockNumber); err != nil {
+				ctx, cancel := context.WithTimeout(context.Background(), jobTimeout)
+				defer cancel()
+
+				if err := hs.pipeline.Run(ctx, blockNumber); err != nil {
 					hs.logg.Error("head syncer: piepline run error", "error", err)
 				}
 			})

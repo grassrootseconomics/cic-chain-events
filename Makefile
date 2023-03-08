@@ -1,27 +1,17 @@
-SHELL := /bin/bash
 BIN := cic-chain-events
+BUILD_CONF := CGO_ENABLED=1 GOOS=linux GOARCH=amd64
+BUILD_COMMIT := $(shell git rev-parse --short HEAD 2> /dev/null)
 
 .PHONY: build
 
+clean:
+	rm ${BIN}
+
 build:
-	CGO_ENABLED=1 go build -v -ldflags="-s -w" -o ${BIN} cmd/*.go
+	${BUILD_CONF} go build -ldflags="-X main.build=${BUILD_COMMIT} -s -w" -o ${BIN} cmd/service/*.go
 
 run:
-	CGO_ENABLED=1 go run -ldflags="-s -w" cmd/*.go
+	${BUILD_CONF} go run cmd/service/*
 
-mod:
-	go mod tidy
-	go mod verify
-
-test-pkg:
-	TEST_GRAPHQL_ENDPOINT=https://rpc.alfajores.celo.grassecon.net/graphql go test -v -covermode atomic -coverprofile=covprofile ./pkg/...
-
-bench-pkg:
-	TEST_RPC_ENDPOINT=https://rpc.alfajores.celo.grassecon.net TEST_GRAPHQL_ENDPOINT=https://rpc.alfajores.celo.grassecon.net/graphql go test -v -bench=. -run=^Benchmark ./pkg/...
-
-migrate:
-	tern migrate -c migrations/tern.conf
-
-docker-clean:
-	docker-compose down
-	docker volume rm cic-chain-events_cic-indexer-pg cic-chain-events_cic-indexer-nats
+run-debug:
+	${BUILD_CONF} go run cmd/service/* -debug

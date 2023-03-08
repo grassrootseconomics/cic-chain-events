@@ -15,25 +15,27 @@ const (
 	headBlockLag = 5
 )
 
-type JanitorOpts struct {
-	BatchSize     uint64
-	Logg          logf.Logger
-	Pipeline      *pipeline.Pipeline
-	Pool          *pond.WorkerPool
-	Stats         *Stats
-	Store         store.Store[pgx.Rows]
-	SweepInterval time.Duration
-}
+type (
+	JanitorOpts struct {
+		BatchSize     uint64
+		Logg          logf.Logger
+		Pipeline      *pipeline.Pipeline
+		Pool          *pond.WorkerPool
+		Stats         *Stats
+		Store         store.Store[pgx.Rows]
+		SweepInterval time.Duration
+	}
 
-type Janitor struct {
-	batchSize     uint64
-	pipeline      *pipeline.Pipeline
-	logg          logf.Logger
-	pool          *pond.WorkerPool
-	stats         *Stats
-	store         store.Store[pgx.Rows]
-	sweepInterval time.Duration
-}
+	Janitor struct {
+		batchSize     uint64
+		pipeline      *pipeline.Pipeline
+		logg          logf.Logger
+		pool          *pond.WorkerPool
+		stats         *Stats
+		store         store.Store[pgx.Rows]
+		sweepInterval time.Duration
+	}
+)
 
 func NewJanitor(o JanitorOpts) *Janitor {
 	return &Janitor{
@@ -56,8 +58,11 @@ func (j *Janitor) Start(ctx context.Context) error {
 			j.logg.Info("janitor: shutdown signal received")
 			return nil
 		case <-ticker.C:
+			ctx, cancel := context.WithTimeout(context.Background(), jobTimeout)
+			defer cancel()
+
 			j.logg.Debug("janitor: starting sweep")
-			if err := j.QueueMissingBlocks(context.Background()); err != nil {
+			if err := j.QueueMissingBlocks(ctx); err != nil {
 				j.logg.Error("janitor: queue missing blocks error", "error", err)
 			}
 		}

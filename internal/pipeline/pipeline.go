@@ -10,19 +10,21 @@ import (
 	"github.com/zerodha/logf"
 )
 
-type PipelineOpts struct {
-	BlockFetcher fetch.Fetch
-	Filters      []filter.Filter
-	Logg         logf.Logger
-	Store        store.Store[pgx.Rows]
-}
+type (
+	PipelineOpts struct {
+		BlockFetcher fetch.Fetch
+		Filters      []filter.Filter
+		Logg         logf.Logger
+		Store        store.Store[pgx.Rows]
+	}
 
-type Pipeline struct {
-	fetch   fetch.Fetch
-	filters []filter.Filter
-	logg    logf.Logger
-	store   store.Store[pgx.Rows]
-}
+	Pipeline struct {
+		fetch   fetch.Fetch
+		filters []filter.Filter
+		logg    logf.Logger
+		store   store.Store[pgx.Rows]
+	}
+)
 
 func NewPipeline(o PipelineOpts) *Pipeline {
 	return &Pipeline{

@@ -3,33 +3,33 @@
 go_process = true
 
 # API server
-[api]
+[service]
 # Host and port
-address = ":8085"
+address = ":5000"
 
 # Geth API endpoints
 [chain]
-graphql_endpoint = "https://rpc.alfajores.celo.grassecon.net/graphql"
-ws_endpoint      = "wss://ws.alfajores.celo.grassecon.net"
+graphql_endpoint = ""
+ws_endpoint      = ""
 
 # Syncer configs
 [syncer]
 # Maximum number of missing blocks pushed into the worker queue every janitor sweep
-janitor_queue_size     = 500
+janitor_queue_size     = 250
 # Number of goroutines assigned to the worker pool
-janitor_concurrency    = 5
+janitor_concurrency    = 3
 # Syncer start block
-initial_lower_bound    = 16373156
+initial_lower_bound    = ""
 # Janitor sweep interval, should take into account concurrency and queue_size
-janitor_sweep_interval = 5
+janitor_sweep_interval = 10
 
 [postgres]
-dsn   = "postgres://postgres:postgres@localhost:5432/cic_chain_events"
+dsn   = ""
 
 # https://docs.nats.io/
 [jetstream]
-endpoint               = "nats://localhost:4222"
+endpoint               = ""
 # Duration JetStream should keep the message before GC
-persist_duration_hours = 48
+persist_duration_hrs = 48
 # Duration to ignore duplicate transactions (e.g. due to restart)
-dedup_duration_hours   = 6
+dedup_duration_hrs   = 6
