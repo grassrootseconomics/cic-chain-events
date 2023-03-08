@@ -97,7 +97,10 @@ func (j *Janitor) QueueMissingBlocks(ctx context.Context) error {
 		return err
 	}
 
-	j.logg.Info("janitor: missing blocks", "count", j.stats.GetHeadCursor()-lowerBound)
+	missingBlockCountReport := j.stats.GetHeadCursor() - lowerBound
+	if missingBlockCountReport > 10 {
+		j.logg.Info("janitor: missing blocks", "count")
+	}
 
 	rowsProcessed := 0
 	for rows.Next() {
