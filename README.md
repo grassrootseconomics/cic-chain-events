@@ -1,7 +1,7 @@
 # cic-chain-events
 
 ![GitHub release (latest by date)](https://img.shields.io/github/v/release/grassrootseconomics/cic-chain-events)
-![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/grassrootseconomics/cic-chain-events/build.yaml)
+![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/grassrootseconomics/cic-chain-events/release.yaml)
 [![Go Report Card](https://goreportcard.com/badge/github.com/grassrootseconomics/cic-chain-events)](https://goreportcard.com/report/github.com/grassrootseconomics/cic-chain-events)
 
 > CIC Chain Events
