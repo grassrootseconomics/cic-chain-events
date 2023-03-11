@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/celo-org/celo-blockchain/common"
+	"github.com/grassrootseconomics/celoutils"
 	"github.com/grassrootseconomics/cic-chain-events/internal/pub"
 	"github.com/grassrootseconomics/cic-chain-events/pkg/fetch"
 	"github.com/grassrootseconomics/w3-celo-patch"
@@ -37,7 +38,7 @@ func NewRegisterFilter(o RegisterFilterOpts) Filter {
 	}
 }
 
-func (f *RegisterFilter) Execute(_ context.Context, transaction fetch.Transaction) (bool, error) {
+func (f *RegisterFilter) Execute(_ context.Context, transaction *fetch.Transaction) (bool, error) {
 	if len(transaction.InputData) < 10 {
 		return true, nil
 	}
@@ -52,7 +53,7 @@ func (f *RegisterFilter) Execute(_ context.Context, transaction fetch.Transactio
 		addEvent := &pub.MinimalTxInfo{
 			Block:           transaction.Block.Number,
 			ContractAddress: transaction.To.Address,
-			To:              transaction.To.Address,
+			To:              celoutils.ChecksumAddress(transaction.To.Address),
 			TxHash:          transaction.Hash,
 			TxIndex:         transaction.Index,
 		}

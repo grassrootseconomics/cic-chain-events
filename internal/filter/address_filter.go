@@ -30,7 +30,7 @@ func NewAddressFilter(o AddressFilterOpts) Filter {
 	}
 }
 
-func (f *AddressFilter) Execute(_ context.Context, transaction fetch.Transaction) (bool, error) {
+func (f *AddressFilter) Execute(_ context.Context, transaction *fetch.Transaction) (bool, error) {
 	if transaction.From.Address == f.systemAddress {
 		return true, nil
 	}

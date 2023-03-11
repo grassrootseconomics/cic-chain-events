@@ -9,8 +9,12 @@ address = ":5000"
 
 # Geth API endpoints
 [chain]
-graphql_endpoint = ""
-ws_endpoint      = ""
+graphql_endpoint    = ""
+ws_endpoint         = ""
+system_address      = ""
+token_index_address = ""
+gas_faucet_address  = ""
+user_index_address  = ""
 
 # Syncer configs
 [syncer]

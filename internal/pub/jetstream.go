@@ -1,9 +1,9 @@
 package pub
 
 import (
+	"encoding/json"
 	"time"
 
-	"github.com/goccy/go-json"
 	"github.com/nats-io/nats.go"
 )
 

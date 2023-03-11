@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/celo-org/celo-blockchain/common/hexutil"
+	"github.com/grassrootseconomics/celoutils"
 	"github.com/grassrootseconomics/cic-chain-events/internal/pub"
 	"github.com/grassrootseconomics/cic-chain-events/pkg/fetch"
 	"github.com/zerodha/logf"
@@ -35,7 +36,7 @@ func NewGasFilter(o GasFilterOpts) Filter {
 	}
 }
 
-func (f *GasFilter) Execute(_ context.Context, transaction fetch.Transaction) (bool, error) {
+func (f *GasFilter) Execute(_ context.Context, transaction *fetch.Transaction) (bool, error) {
 	transferValue, err := hexutil.DecodeUint64(transaction.Value)
 	if err != nil {
 		return false, err
@@ -45,7 +46,7 @@ func (f *GasFilter) Execute(_ context.Context, transaction fetch.Transaction) (b
 	if transaction.From.Address == f.systemAddress && transferValue > 0 {
 		transferEvent := &pub.MinimalTxInfo{
 			Block:   transaction.Block.Number,
-			To:      transaction.To.Address,
+			To:      celoutils.ChecksumAddress(transaction.To.Address),
 			TxHash:  transaction.Hash,
 			TxIndex: transaction.Index,
 			Value:   transferValue,

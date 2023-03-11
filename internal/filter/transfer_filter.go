@@ -5,6 +5,7 @@ import (
 	"math/big"
 
 	"github.com/celo-org/celo-blockchain/common"
+	"github.com/grassrootseconomics/celoutils"
 	"github.com/grassrootseconomics/cic-chain-events/internal/pub"
 	"github.com/grassrootseconomics/cic-chain-events/pkg/fetch"
 	"github.com/grassrootseconomics/w3-celo-patch"
@@ -40,7 +41,7 @@ func NewTransferFilter(o TransferFilterOpts) Filter {
 	}
 }
 
-func (f *TransferFilter) Execute(_ context.Context, transaction fetch.Transaction) (bool, error) {
+func (f *TransferFilter) Execute(_ context.Context, transaction *fetch.Transaction) (bool, error) {
 	if len(transaction.InputData) < 10 {
 		return true, nil
 	}
@@ -60,7 +61,7 @@ func (f *TransferFilter) Execute(_ context.Context, transaction fetch.Transactio
 
 		transferEvent := &pub.MinimalTxInfo{
 			Block:           transaction.Block.Number,
-			From:            transaction.From.Address,
+			From:            celoutils.ChecksumAddress(transaction.From.Address),
 			To:              to.Hex(),
 			ContractAddress: transaction.To.Address,
 			TxHash:          transaction.Hash,
@@ -131,7 +132,7 @@ func (f *TransferFilter) Execute(_ context.Context, transaction fetch.Transactio
 
 		transferEvent := &pub.MinimalTxInfo{
 			Block:           transaction.Block.Number,
-			From:            transaction.From.Address,
+			From:            celoutils.ChecksumAddress(transaction.From.Address),
 			To:              to.Hex(),
 			ContractAddress: transaction.To.Address,
 			TxHash:          transaction.Hash,

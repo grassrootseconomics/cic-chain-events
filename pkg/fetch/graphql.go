@@ -3,11 +3,10 @@ package fetch
 import (
 	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"time"
-
-	"github.com/goccy/go-json"
 )
 
 const (
@@ -26,6 +25,11 @@ type Graphql struct {
 func NewGraphqlFetcher(o GraphqlOpts) Fetch {
 	return &Graphql{
 		httpClient: &http.Client{
+			Transport: &http.Transport{
+				MaxIdleConns:        100,
+				MaxIdleConnsPerHost: 100,
+				IdleConnTimeout:     60 * time.Second,
+			},
 			Timeout: time.Second * 5,
 		},
 		graphqlEndpoint: o.GraphqlEndpoint,
@@ -33,28 +37,26 @@ func NewGraphqlFetcher(o GraphqlOpts) Fetch {
 }
 
 func (f *Graphql) Block(ctx context.Context, blockNumber uint64) (FetchResponse, error) {
-	var (
-		fetchResponse FetchResponse
-	)
+	fetchResponse := FetchResponse{}
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, f.graphqlEndpoint, bytes.NewBufferString(fmt.Sprintf(graphqlQuery, blockNumber)))
 	if err != nil {
-		return FetchResponse{}, err
+		return fetchResponse, err
 	}
 	req.Header.Set("Content-Type", "application/json")
 
 	resp, err := f.httpClient.Do(req)
 	if err != nil {
-		return FetchResponse{}, err
-	}
-
-	if resp.StatusCode >= http.StatusBadRequest {
-		return FetchResponse{}, fmt.Errorf("error fetching block %s", resp.Status)
+		return fetchResponse, err
 	}
 	defer resp.Body.Close()
 
+	if resp.StatusCode >= http.StatusBadRequest {
+		return fetchResponse, fmt.Errorf("error fetching block %s", resp.Status)
+	}
+
 	if err := json.NewDecoder(resp.Body).Decode(&fetchResponse); err != nil {
-		return FetchResponse{}, err
+		return fetchResponse, err
 	}
 
 	return fetchResponse, nil
