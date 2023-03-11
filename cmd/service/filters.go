@@ -9,10 +9,13 @@ import (
 )
 
 var (
-	systemAddress = ko.MustString("chain.system_address")
+	systemAddress string
 )
 
 func initAddressFilter() filter.Filter {
+	// TODO: Temporary shortcut
+	systemAddress = ko.MustString("chain.system_address")
+
 	// TODO: Bootstrap addresses from smart contract
 	// TODO: Add route to update cache
 	cache := &sync.Map{}
@@ -22,9 +25,8 @@ func initAddressFilter() filter.Filter {
 	cache.Store(strings.ToLower(ko.MustString("chain.user_index_address")), "UserIndex")
 
 	return filter.NewAddressFilter(filter.AddressFilterOpts{
-		Cache: cache,
-		Logg:  lo,
-		// TODO: Temporary shortcut
+		Cache:         cache,
+		Logg:          lo,
 		SystemAddress: systemAddress,
 	})
 }
