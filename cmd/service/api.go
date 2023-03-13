@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/VictoriaMetrics/metrics"
 	"github.com/labstack/echo/v4"
+	echopprof "github.com/sevenNt/echo-pprof"
 )
 
 func initApiServer() *echo.Echo {
@@ -15,6 +16,10 @@ func initApiServer() *echo.Echo {
 			metrics.WritePrometheus(c.Response(), true)
 			return nil
 		})
+	}
+
+	if debugFlag {
+		echopprof.Wrap(server)
 	}
 
 	return server

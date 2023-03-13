@@ -15,6 +15,7 @@ require (
 	github.com/knadh/koanf/v2 v2.0.0
 	github.com/labstack/echo/v4 v4.10.2
 	github.com/nats-io/nats.go v1.24.0
+	github.com/sevenNt/echo-pprof v0.1.1-0.20230131020615-4dd36891e14b
 	github.com/stretchr/testify v1.8.2
 	github.com/zerodha/logf v0.5.5
 )
