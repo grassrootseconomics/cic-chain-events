@@ -2,8 +2,8 @@ package main
 
 import (
 	"github.com/VictoriaMetrics/metrics"
+	"github.com/grassrootseconomics/cic-chain-events/pkg/echopprof"
 	"github.com/labstack/echo/v4"
-	echopprof "github.com/sevenNt/echo-pprof"
 )
 
 func initApiServer() *echo.Echo {
@@ -18,9 +18,7 @@ func initApiServer() *echo.Echo {
 		})
 	}
 
-	if debugFlag {
-		echopprof.Wrap(server)
-	}
+	echopprof.Wrap(server)
 
 	return server
 }
