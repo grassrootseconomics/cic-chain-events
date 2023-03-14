@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"time"
 )
@@ -49,13 +50,18 @@ func (f *Graphql) Block(ctx context.Context, blockNumber uint64) (FetchResponse,
 	if err != nil {
 		return fetchResponse, err
 	}
-	defer resp.Body.Close()
 
 	if resp.StatusCode >= http.StatusBadRequest {
 		return fetchResponse, fmt.Errorf("error fetching block %s", resp.Status)
 	}
 
-	if err := json.NewDecoder(resp.Body).Decode(&fetchResponse); err != nil {
+	out, err := io.ReadAll(resp.Body)
+	_ = resp.Body.Close()
+	if err != nil {
+		return fetchResponse, nil
+	}
+
+	if err := json.Unmarshal(out, &fetchResponse); err != nil {
 		return fetchResponse, err
 	}
 
