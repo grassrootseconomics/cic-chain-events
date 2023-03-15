@@ -14,7 +14,7 @@ var (
 
 func initAddressFilter() filter.Filter {
 	// TODO: Temporary shortcut
-	systemAddress = ko.MustString("chain.system_address")
+	systemAddress = strings.ToLower(ko.MustString("chain.system_address"))
 
 	// TODO: Bootstrap addresses from smart contract
 	// TODO: Add route to update cache

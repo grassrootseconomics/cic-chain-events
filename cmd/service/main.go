@@ -11,7 +11,6 @@ import (
 	"github.com/grassrootseconomics/cic-chain-events/internal/pipeline"
 	"github.com/grassrootseconomics/cic-chain-events/internal/pub"
 	"github.com/grassrootseconomics/cic-chain-events/internal/syncer"
-	"github.com/knadh/goyesql/v2"
 	"github.com/knadh/koanf/v2"
 	"github.com/labstack/echo/v4"
 	"github.com/zerodha/logf"
@@ -34,7 +33,6 @@ var (
 
 	ko *koanf.Koanf
 	lo logf.Logger
-	q  goyesql.Queries
 )
 
 func init() {
