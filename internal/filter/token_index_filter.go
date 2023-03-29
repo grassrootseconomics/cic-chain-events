@@ -2,6 +2,8 @@ package filter
 
 import (
 	"context"
+	"strings"
+	"sync"
 
 	"github.com/celo-org/celo-blockchain/common"
 	"github.com/grassrootseconomics/celoutils"
@@ -12,45 +14,50 @@ import (
 )
 
 const (
-	gasEventSubject = "CHAIN.gas"
+	tokenIndexFilterEventSubject = "CHAIN.tokenAdded"
 )
 
 var (
-	giveToSig = w3.MustNewFunc("giveTo(address)", "uint256")
+	addSig = w3.MustNewFunc("add(address)", "bool")
 )
 
 type (
-	GasFilterOpts struct {
-		Logg logf.Logger
-		Pub  *pub.Pub
+	TokenIndexFilterOpts struct {
+		Cache *sync.Map
+		Logg  logf.Logger
+		Pub   *pub.Pub
 	}
 
-	GasFilter struct {
-		logg logf.Logger
-		pub  *pub.Pub
+	TokenIndexFilter struct {
+		pub   *pub.Pub
+		cache *sync.Map
+		logg  logf.Logger
 	}
 )
 
-func NewGasFilter(o GasFilterOpts) Filter {
-	return &GasFilter{
-		logg: o.Logg,
-		pub:  o.Pub,
+func NewTokenIndexFilter(o TokenIndexFilterOpts) Filter {
+	return &TokenIndexFilter{
+		cache: o.Cache,
+		logg:  o.Logg,
+		pub:   o.Pub,
 	}
 }
 
-func (f *GasFilter) Execute(_ context.Context, transaction *fetch.Transaction) (bool, error) {
+func (f *TokenIndexFilter) Execute(_ context.Context, transaction *fetch.Transaction) (bool, error) {
 	if len(transaction.InputData) < 10 {
 		return true, nil
 	}
 
-	if transaction.InputData[:10] == "0x63e4bff4" {
+	if transaction.InputData[:10] == "0x0a3b0a4f" {
 		var address common.Address
 
-		if err := giveToSig.DecodeArgs(w3.B(transaction.InputData), &address); err != nil {
+		if err := addSig.DecodeArgs(w3.B(transaction.InputData), &address); err != nil {
 			return false, err
 		}
 
-		giveToEvent := &pub.MinimalTxInfo{
+		f.cache.Store(strings.ToLower(address.Hex()), transaction.Hash)
+
+		addEvent := &pub.MinimalTxInfo{
 			Block:           transaction.Block.Number,
 			ContractAddress: celoutils.ChecksumAddress(transaction.To.Address),
 			To:              address.Hex(),
@@ -59,19 +66,16 @@ func (f *GasFilter) Execute(_ context.Context, transaction *fetch.Transaction) (
 		}
 
 		if transaction.Status == 1 {
-			giveToEvent.Success = true
+			addEvent.Success = true
 		}
 
 		if err := f.pub.Publish(
-			gasEventSubject,
+			tokenIndexFilterEventSubject,
 			transaction.Hash,
-			giveToEvent,
+			addEvent,
 		); err != nil {
 			return false, err
 		}
-
-		return true, nil
 	}
-
 	return true, nil
 }

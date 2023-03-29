@@ -17,7 +17,7 @@ import (
 )
 
 type (
-	internalServiceContainer struct {
+	internalServicesContainer struct {
 		apiService *echo.Echo
 		pub        *pub.Pub
 	}
@@ -55,19 +55,23 @@ func main() {
 	natsConn, jsCtx := initJetStream()
 	jsPub := initPub(natsConn, jsCtx)
 
+	celoProvider := initCeloProvider()
+	cache := &sync.Map{}
+
 	pipeline := pipeline.NewPipeline(pipeline.PipelineOpts{
 		BlockFetcher: graphqlFetcher,
 		Filters: []filter.Filter{
-			initAddressFilter(),
+			initAddressFilter(celoProvider, cache),
 			initGasGiftFilter(jsPub),
 			initTransferFilter(jsPub),
 			initRegisterFilter(jsPub),
+			initTokenIndexFilter(cache, jsPub),
 		},
 		Logg:  lo,
 		Store: pgStore,
 	})
 
-	internalServices := &internalServiceContainer{
+	internalServices := &internalServicesContainer{
 		pub: jsPub,
 	}
 	syncerStats := &syncer.Stats{}

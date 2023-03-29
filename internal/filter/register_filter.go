@@ -16,44 +16,44 @@ const (
 )
 
 var (
-	addSig = w3.MustNewFunc("add(address)", "bool")
+	registerSig = w3.MustNewFunc("register(address)", "")
 )
 
 type (
 	RegisterFilterOpts struct {
-		Logg logf.Logger
-		Pub  *pub.Pub
+		Logg    logf.Logger
+		Pub     *pub.Pub
 	}
 
 	RegisterFilter struct {
-		logg logf.Logger
-		pub  *pub.Pub
+		logg    logf.Logger
+		pub     *pub.Pub
 	}
 )
 
 func NewRegisterFilter(o RegisterFilterOpts) Filter {
 	return &RegisterFilter{
-		logg: o.Logg,
-		pub:  o.Pub,
+		logg:    o.Logg,
+		pub:     o.Pub,
 	}
 }
 
 func (f *RegisterFilter) Execute(_ context.Context, transaction *fetch.Transaction) (bool, error) {
-	if len(transaction.InputData) < 10 {
+	if len(transaction.InputData) < 10  {
 		return true, nil
 	}
 
-	if transaction.InputData[:10] == "0x0a3b0a4f" {
+	if transaction.InputData[:10] == "0x4420e486" {
 		var address common.Address
 
-		if err := addSig.DecodeArgs(w3.B(transaction.InputData), &address); err != nil {
+		if err := registerSig.DecodeArgs(w3.B(transaction.InputData), &address); err != nil {
 			return false, err
 		}
 
 		addEvent := &pub.MinimalTxInfo{
 			Block:           transaction.Block.Number,
-			ContractAddress: transaction.To.Address,
-			To:              celoutils.ChecksumAddress(transaction.To.Address),
+			ContractAddress: celoutils.ChecksumAddress(transaction.To.Address),
+			To:              address.Hex(),
 			TxHash:          transaction.Hash,
 			TxIndex:         transaction.Index,
 		}
