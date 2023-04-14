@@ -5,16 +5,15 @@ go_process = true
 # API server
 [service]
 # Host and port
-address = ":5000"
+address = ":5001"
 
 # Geth API endpoints
 [chain]
-graphql_endpoint    = ""
-ws_endpoint         = ""
-system_address      = ""
-token_index_address = ""
-gas_faucet_address  = ""
-user_index_address  = ""
+graphql_endpoint = ""
+ws_endpoint      = ""
+rpc_endpoint     = ""
+testnet          = true
+registry_address = ""
 
 # Syncer configs
 [syncer]

@@ -57,13 +57,11 @@ func (f *TransferFilter) Execute(_ context.Context, transaction *fetch.Transacti
 			return false, err
 		}
 
-		f.logg.Debug("transfer_filter: new reg", "transfer", to)
-
 		transferEvent := &pub.MinimalTxInfo{
 			Block:           transaction.Block.Number,
 			From:            celoutils.ChecksumAddress(transaction.From.Address),
 			To:              to.Hex(),
-			ContractAddress: transaction.To.Address,
+			ContractAddress: celoutils.ChecksumAddress(transaction.To.Address),
 			TxHash:          transaction.Hash,
 			TxIndex:         transaction.Index,
 			Value:           value.Uint64(),
@@ -93,13 +91,11 @@ func (f *TransferFilter) Execute(_ context.Context, transaction *fetch.Transacti
 			return false, err
 		}
 
-		f.logg.Debug("transfer_filter: new reg", "transferFrom", to)
-
 		transferEvent := &pub.MinimalTxInfo{
 			Block:           transaction.Block.Number,
 			From:            from.Hex(),
 			To:              to.Hex(),
-			ContractAddress: transaction.To.Address,
+			ContractAddress: celoutils.ChecksumAddress(transaction.To.Address),
 			TxHash:          transaction.Hash,
 			TxIndex:         transaction.Index,
 			Value:           value.Uint64(),
@@ -128,13 +124,11 @@ func (f *TransferFilter) Execute(_ context.Context, transaction *fetch.Transacti
 			return false, err
 		}
 
-		f.logg.Debug("transfer_filter: new reg", "mintTo", to)
-
 		transferEvent := &pub.MinimalTxInfo{
 			Block:           transaction.Block.Number,
 			From:            celoutils.ChecksumAddress(transaction.From.Address),
 			To:              to.Hex(),
-			ContractAddress: transaction.To.Address,
+			ContractAddress: celoutils.ChecksumAddress(transaction.To.Address),
 			TxHash:          transaction.Hash,
 			TxIndex:         transaction.Index,
 			Value:           value.Uint64(),

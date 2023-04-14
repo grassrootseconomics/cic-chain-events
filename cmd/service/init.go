@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/alitto/pond"
+	"github.com/grassrootseconomics/celoutils"
 	"github.com/grassrootseconomics/cic-chain-events/internal/pool"
 	"github.com/grassrootseconomics/cic-chain-events/internal/pub"
 	"github.com/grassrootseconomics/cic-chain-events/internal/store"
@@ -127,4 +128,23 @@ func initPub(natsConn *nats.Conn, jsCtx nats.JetStreamContext) *pub.Pub {
 	}
 
 	return pub
+}
+
+func initCeloProvider() *celoutils.Provider {
+	providerOpts := celoutils.ProviderOpts{
+		RpcEndpoint: ko.MustString("chain.rpc_endpoint"),
+	}
+
+	if ko.Bool("chain.testnet") {
+		providerOpts.ChainId = celoutils.TestnetChainId
+	} else {
+		providerOpts.ChainId = celoutils.MainnetChainId
+	}
+
+	provider, err := celoutils.NewProvider(providerOpts)
+	if err != nil {
+		lo.Fatal("init: critical error loading chain provider", "error", err)
+	}
+
+	return provider
 }

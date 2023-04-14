@@ -10,31 +10,24 @@ import (
 
 type (
 	AddressFilterOpts struct {
-		Cache         *sync.Map
-		Logg          logf.Logger
-		SystemAddress string
+		Cache *sync.Map
+		Logg  logf.Logger
 	}
 
 	AddressFilter struct {
-		cache         *sync.Map
-		logg          logf.Logger
-		systemAddress string
+		cache *sync.Map
+		logg  logf.Logger
 	}
 )
 
 func NewAddressFilter(o AddressFilterOpts) Filter {
 	return &AddressFilter{
-		cache:         o.Cache,
-		logg:          o.Logg,
-		systemAddress: o.SystemAddress,
+		cache: o.Cache,
+		logg:  o.Logg,
 	}
 }
 
 func (f *AddressFilter) Execute(_ context.Context, transaction *fetch.Transaction) (bool, error) {
-	if transaction.From.Address == f.systemAddress {
-		return true, nil
-	}
-
 	if _, found := f.cache.Load(transaction.To.Address); found {
 		return true, nil
 	}
