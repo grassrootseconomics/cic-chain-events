@@ -5,7 +5,7 @@ go_process = true
 # API server
 [service]
 # Host and port
-address = ":5000"
+address = ":5001"
 
 # Geth API endpoints
 [chain]
