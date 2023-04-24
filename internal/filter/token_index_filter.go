@@ -6,6 +6,7 @@ import (
 	"sync"
 
 	"github.com/celo-org/celo-blockchain/common"
+	"github.com/celo-org/celo-blockchain/common/hexutil"
 	"github.com/grassrootseconomics/celoutils"
 	"github.com/grassrootseconomics/cic-chain-events/internal/pub"
 	"github.com/grassrootseconomics/cic-chain-events/pkg/fetch"
@@ -60,9 +61,11 @@ func (f *TokenIndexFilter) Execute(_ context.Context, transaction *fetch.Transac
 		addEvent := &pub.MinimalTxInfo{
 			Block:           transaction.Block.Number,
 			ContractAddress: celoutils.ChecksumAddress(transaction.To.Address),
+			Timestamp:       hexutil.MustDecodeUint64(transaction.Block.Timestamp),
 			To:              address.Hex(),
 			TxHash:          transaction.Hash,
 			TxIndex:         transaction.Index,
+			TXType:          "tokenAdd",
 		}
 
 		if transaction.Status == 1 {

@@ -5,6 +5,7 @@ import (
 	"math/big"
 
 	"github.com/celo-org/celo-blockchain/common"
+	"github.com/celo-org/celo-blockchain/common/hexutil"
 	"github.com/grassrootseconomics/celoutils"
 	"github.com/grassrootseconomics/cic-chain-events/internal/pub"
 	"github.com/grassrootseconomics/cic-chain-events/pkg/fetch"
@@ -60,10 +61,12 @@ func (f *TransferFilter) Execute(_ context.Context, transaction *fetch.Transacti
 		transferEvent := &pub.MinimalTxInfo{
 			Block:           transaction.Block.Number,
 			From:            celoutils.ChecksumAddress(transaction.From.Address),
+			Timestamp:       hexutil.MustDecodeUint64(transaction.Block.Timestamp),
 			To:              to.Hex(),
 			ContractAddress: celoutils.ChecksumAddress(transaction.To.Address),
 			TxHash:          transaction.Hash,
 			TxIndex:         transaction.Index,
+			TXType:          "transfer",
 			Value:           value.Uint64(),
 		}
 
@@ -94,10 +97,12 @@ func (f *TransferFilter) Execute(_ context.Context, transaction *fetch.Transacti
 		transferEvent := &pub.MinimalTxInfo{
 			Block:           transaction.Block.Number,
 			From:            from.Hex(),
+			Timestamp:       hexutil.MustDecodeUint64(transaction.Block.Timestamp),
 			To:              to.Hex(),
 			ContractAddress: celoutils.ChecksumAddress(transaction.To.Address),
 			TxHash:          transaction.Hash,
 			TxIndex:         transaction.Index,
+			TXType:          "transferFrom",
 			Value:           value.Uint64(),
 		}
 
@@ -127,10 +132,12 @@ func (f *TransferFilter) Execute(_ context.Context, transaction *fetch.Transacti
 		transferEvent := &pub.MinimalTxInfo{
 			Block:           transaction.Block.Number,
 			From:            celoutils.ChecksumAddress(transaction.From.Address),
+			Timestamp:       hexutil.MustDecodeUint64(transaction.Block.Timestamp),
 			To:              to.Hex(),
 			ContractAddress: celoutils.ChecksumAddress(transaction.To.Address),
 			TxHash:          transaction.Hash,
 			TxIndex:         transaction.Index,
+			TXType:          "mintTo",
 			Value:           value.Uint64(),
 		}
 

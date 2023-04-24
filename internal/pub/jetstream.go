@@ -31,8 +31,10 @@ type (
 		To              string `json:"to"`
 		ContractAddress string `json:"contractAddress"`
 		Success         bool   `json:"success"`
+		Timestamp       uint64 `json:"timestamp"`
 		TxHash          string `json:"transactionHash"`
 		TxIndex         uint   `json:"transactionIndex"`
+		TXType          string `json:"txType"`
 		Value           uint64 `json:"value"`
 	}
 )

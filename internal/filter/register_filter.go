@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/celo-org/celo-blockchain/common"
+	"github.com/celo-org/celo-blockchain/common/hexutil"
 	"github.com/grassrootseconomics/celoutils"
 	"github.com/grassrootseconomics/cic-chain-events/internal/pub"
 	"github.com/grassrootseconomics/cic-chain-events/pkg/fetch"
@@ -21,25 +22,25 @@ var (
 
 type (
 	RegisterFilterOpts struct {
-		Logg    logf.Logger
-		Pub     *pub.Pub
+		Logg logf.Logger
+		Pub  *pub.Pub
 	}
 
 	RegisterFilter struct {
-		logg    logf.Logger
-		pub     *pub.Pub
+		logg logf.Logger
+		pub  *pub.Pub
 	}
 )
 
 func NewRegisterFilter(o RegisterFilterOpts) Filter {
 	return &RegisterFilter{
-		logg:    o.Logg,
-		pub:     o.Pub,
+		logg: o.Logg,
+		pub:  o.Pub,
 	}
 }
 
 func (f *RegisterFilter) Execute(_ context.Context, transaction *fetch.Transaction) (bool, error) {
-	if len(transaction.InputData) < 10  {
+	if len(transaction.InputData) < 10 {
 		return true, nil
 	}
 
@@ -53,9 +54,11 @@ func (f *RegisterFilter) Execute(_ context.Context, transaction *fetch.Transacti
 		addEvent := &pub.MinimalTxInfo{
 			Block:           transaction.Block.Number,
 			ContractAddress: celoutils.ChecksumAddress(transaction.To.Address),
+			Timestamp:       hexutil.MustDecodeUint64(transaction.Block.Timestamp),
 			To:              address.Hex(),
 			TxHash:          transaction.Hash,
 			TxIndex:         transaction.Index,
+			TXType:          "register",
 		}
 
 		if transaction.Status == 1 {
