@@ -6,7 +6,7 @@ require (
 	github.com/VictoriaMetrics/metrics v1.23.1
 	github.com/alitto/pond v1.8.3
 	github.com/celo-org/celo-blockchain v1.7.2
-	github.com/grassrootseconomics/celoutils v1.2.1
+	github.com/grassrootseconomics/celoutils v1.3.0
 	github.com/grassrootseconomics/w3-celo-patch v0.2.0
 	github.com/jackc/pgx/v5 v5.3.1
 	github.com/jackc/tern/v2 v2.1.0
