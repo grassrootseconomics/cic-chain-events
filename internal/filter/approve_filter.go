@@ -59,6 +59,7 @@ func (f *ApproveFilter) Execute(_ context.Context, transaction *fetch.Transactio
 			Block:           transaction.Block.Number,
 			ContractAddress: celoutils.ChecksumAddress(transaction.To.Address),
 			Timestamp:       hexutil.MustDecodeUint64(transaction.Block.Timestamp),
+			From:            celoutils.ChecksumAddress(transaction.From.Address),
 			To:              address.Hex(),
 			TxHash:          transaction.Hash,
 			TxIndex:         transaction.Index,
