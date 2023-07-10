@@ -3,7 +3,7 @@ module github.com/grassrootseconomics/cic-chain-events
 go 1.20
 
 require (
-	github.com/VictoriaMetrics/metrics v1.23.1
+	github.com/VictoriaMetrics/metrics v1.24.0
 	github.com/alitto/pond v1.8.3
 	github.com/celo-org/celo-blockchain v1.7.2
 	github.com/grassrootseconomics/celoutils v1.4.0
