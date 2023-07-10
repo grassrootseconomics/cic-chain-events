@@ -91,6 +91,13 @@ func initRegisterFilter(pub *pub.Pub) filter.Filter {
 	})
 }
 
+func initApproveFilter(pub *pub.Pub) filter.Filter {
+	return filter.NewApproveFilter(filter.ApproveFilterOpts{
+		Pub:  pub,
+		Logg: lo,
+	})
+}
+
 func initTokenIndexFilter(cache *sync.Map, pub *pub.Pub) filter.Filter {
 	return filter.NewTokenIndexFilter(filter.TokenIndexFilterOpts{
 		Cache: cache,

@@ -65,6 +65,7 @@ func main() {
 			initGasGiftFilter(jsPub),
 			initTransferFilter(jsPub),
 			initRegisterFilter(jsPub),
+			initApproveFilter(jsPub),
 			initTokenIndexFilter(cache, jsPub),
 		},
 		Logg:  lo,
