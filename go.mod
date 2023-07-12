@@ -8,7 +8,7 @@ require (
 	github.com/celo-org/celo-blockchain v1.7.2
 	github.com/grassrootseconomics/celoutils v1.4.0
 	github.com/grassrootseconomics/w3-celo-patch v0.2.0
-	github.com/jackc/pgx/v5 v5.4.1
+	github.com/jackc/pgx/v5 v5.4.2
 	github.com/jackc/tern/v2 v2.1.0
 	github.com/knadh/goyesql/v2 v2.2.0
 	github.com/knadh/koanf v1.5.0
