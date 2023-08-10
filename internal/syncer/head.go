@@ -8,12 +8,12 @@ import (
 	"github.com/celo-org/celo-blockchain/core/types"
 	"github.com/celo-org/celo-blockchain/ethclient"
 	"github.com/celo-org/celo-blockchain/event"
-	"github.com/grassrootseconomics/cic-chain-events/internal/pipeline"
+	"github.com/inethi/inethi-cic-chain-events/internal/pipeline"
 	"github.com/zerodha/logf"
 )
 
 const (
-	jobTimeout         = 5 * time.Second
+	jobTimeout         = 15 * time.Second
 	resubscribeBackoff = 2 * time.Second
 )
 

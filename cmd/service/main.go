@@ -7,10 +7,10 @@ import (
 	"sync"
 	"time"
 
-	"github.com/grassrootseconomics/cic-chain-events/internal/filter"
-	"github.com/grassrootseconomics/cic-chain-events/internal/pipeline"
-	"github.com/grassrootseconomics/cic-chain-events/internal/pub"
-	"github.com/grassrootseconomics/cic-chain-events/internal/syncer"
+	"github.com/inethi/inethi-cic-chain-events/internal/filter"
+	"github.com/inethi/inethi-cic-chain-events/internal/pipeline"
+	"github.com/inethi/inethi-cic-chain-events/internal/pub"
+	"github.com/inethi/inethi-cic-chain-events/internal/syncer"
 	"github.com/knadh/koanf/v2"
 	"github.com/labstack/echo/v4"
 	"github.com/zerodha/logf"
@@ -62,11 +62,7 @@ func main() {
 		BlockFetcher: graphqlFetcher,
 		Filters: []filter.Filter{
 			initAddressFilter(celoProvider, cache),
-			initGasGiftFilter(jsPub),
 			initTransferFilter(jsPub),
-			initRegisterFilter(jsPub),
-			initApproveFilter(jsPub),
-			initTokenIndexFilter(cache, jsPub),
 		},
 		Logg:  lo,
 		Store: pgStore,

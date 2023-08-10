@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/VictoriaMetrics/metrics"
-	"github.com/grassrootseconomics/cic-chain-events/pkg/echopprof"
+	"github.com/inethi/inethi-cic-chain-events/pkg/echopprof"
 	"github.com/labstack/echo/v4"
 )
 

@@ -5,8 +5,8 @@ import (
 	"time"
 
 	"github.com/alitto/pond"
-	"github.com/grassrootseconomics/cic-chain-events/internal/pipeline"
-	"github.com/grassrootseconomics/cic-chain-events/internal/store"
+	"github.com/inethi/inethi-cic-chain-events/internal/pipeline"
+	"github.com/inethi/inethi-cic-chain-events/internal/store"
 	"github.com/jackc/pgx/v5"
 	"github.com/zerodha/logf"
 )

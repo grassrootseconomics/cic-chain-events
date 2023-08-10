@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/alitto/pond"
-	"github.com/grassrootseconomics/cic-chain-events/internal/syncer"
+	"github.com/inethi/inethi-cic-chain-events/internal/syncer"
 	"github.com/labstack/echo/v4"
 )
 

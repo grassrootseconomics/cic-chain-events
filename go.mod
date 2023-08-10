@@ -1,4 +1,4 @@
-module github.com/grassrootseconomics/cic-chain-events
+module github.com/inethi/inethi-cic-chain-events
 
 go 1.20
 

@@ -3,9 +3,9 @@ package pipeline
 import (
 	"context"
 
-	"github.com/grassrootseconomics/cic-chain-events/internal/filter"
-	"github.com/grassrootseconomics/cic-chain-events/internal/store"
-	"github.com/grassrootseconomics/cic-chain-events/pkg/fetch"
+	"github.com/inethi/inethi-cic-chain-events/internal/filter"
+	"github.com/inethi/inethi-cic-chain-events/internal/store"
+	"github.com/inethi/inethi-cic-chain-events/pkg/fetch"
 	"github.com/jackc/pgx/v5"
 	"github.com/zerodha/logf"
 )

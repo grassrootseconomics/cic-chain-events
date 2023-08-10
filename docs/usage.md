@@ -22,7 +22,7 @@ The base config is described in `config.toml`. Values can be overriden with env 
 
 **Compiling the binary**
 
-Run `make build` or download pre-compiled binaries from the [releases](https://github.com/grassrootseconomics/cic-chain-events/releases) page.
+Run `make build` or download pre-compiled binaries from the [releases](https://github.com/inethi/inethi-cic-chain-events/releases) page.
 
 Then start the service with `./cic-chain-events`
 
@@ -36,7 +36,7 @@ Optional flags:
 
 To pull the pre-built docker image:
 
-`docker pull ghcr.io/grassrootseconomics/cic-chain-events/cic-chain-events:latest`
+`docker pull ghcr.io/inethi/inethi-cic-chain-events/cic-chain-events:latest`
 
 Or to build it:
 

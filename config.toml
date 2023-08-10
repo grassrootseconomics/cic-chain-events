@@ -12,8 +12,7 @@ address = ":5001"
 graphql_endpoint = ""
 ws_endpoint      = ""
 rpc_endpoint     = ""
-testnet          = true
-registry_address = ""
+testnet          = false
 
 # Syncer configs
 [syncer]

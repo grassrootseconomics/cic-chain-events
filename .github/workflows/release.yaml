@@ -53,8 +53,8 @@ jobs:
         cache-from: type=local,src=/tmp/.buildx-cache
         cache-to: type=local,dest=/tmp/.buildx-cache
         tags: |
-          ghcr.io/grassrootseconomics/cic-chain-events/cic-chain-events:latest
-          ghcr.io/grassrootseconomics/cic-chain-events/cic-chain-events:${{ env.RELEASE_TAG }}
+          ghcr.io/inethi/inethi-cic-chain-events/cic-chain-events:latest
+          ghcr.io/inethi/inethi-cic-chain-events/cic-chain-events:${{ env.RELEASE_TAG }}
 
   goreleaser:
     runs-on: ubuntu-latest

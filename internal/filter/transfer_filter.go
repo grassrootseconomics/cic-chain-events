@@ -7,9 +7,9 @@ import (
 	"github.com/celo-org/celo-blockchain/common"
 	"github.com/celo-org/celo-blockchain/common/hexutil"
 	"github.com/grassrootseconomics/celoutils"
-	"github.com/grassrootseconomics/cic-chain-events/internal/pub"
-	"github.com/grassrootseconomics/cic-chain-events/pkg/fetch"
 	"github.com/grassrootseconomics/w3-celo-patch"
+	"github.com/inethi/inethi-cic-chain-events/internal/pub"
+	"github.com/inethi/inethi-cic-chain-events/pkg/fetch"
 	"github.com/zerodha/logf"
 )
 
