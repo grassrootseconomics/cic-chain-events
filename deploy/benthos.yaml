@@ -1,0 +1,41 @@
+input:
+  label: cic_chain_events
+  nats_jetstream:
+    urls:
+      - nats://localhost:4222
+    subject: CHAIN.transfer
+    durable: benthos_sub
+    stream: CHAIN
+    deliver: all
+pipeline:
+  processors:
+    - label: event_transformer
+      bloblang: |
+        root = this
+        root.timestamp = (this.timestamp).ts_format()
+        root.txType = if this.txType == "transfer" {
+          "TRANSFER"
+        } else if this.txType == "mintTo" {
+          "MINT_TO"
+        } else {
+          "TRANSFER_FROM"  
+        }
+output:
+  broker:
+    outputs:
+      - label: webhooks
+        http_client:
+          # To be updated to a secure endpoint
+          url: "https://webhook.site/ab61ace1-52bf-4495-a11a-4630a2a7cb6f"
+          verb: POST
+          timeout: 5s
+      - label: logg
+        stdout:
+          codec: lines
+
+logger:
+  level: DEBUG
+  format: logfmt
+  add_timestamp: false
+  static_fields:
+    '@service': benthos
