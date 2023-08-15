@@ -42,6 +42,8 @@ services:
     depends_on:
       nats:
         condition: service_started
+      cic-chain-events:
+        condition: service_started        
     volumes:
       - ./benthos.yaml:/benthos.yaml      
 volumes:
