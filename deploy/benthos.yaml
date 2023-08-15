@@ -2,7 +2,7 @@ input:
   label: cic_chain_events
   nats_jetstream:
     urls:
-      - nats://localhost:4222
+      - nats://nats:4222
     subject: CHAIN.transfer
     durable: benthos_sub
     stream: CHAIN
