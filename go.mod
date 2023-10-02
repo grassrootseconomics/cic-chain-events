@@ -26,7 +26,6 @@ require (
 	github.com/Masterminds/sprig/v3 v3.2.3 // indirect
 	github.com/StackExchange/wmi v0.0.0-20180116203802-5d049714c4a6 // indirect
 	github.com/VictoriaMetrics/fastcache v1.6.0 // indirect
-	github.com/btcsuite/btcd v0.20.1-beta // indirect
 	github.com/celo-org/celo-bls-go v0.3.3 // indirect
 	github.com/celo-org/celo-bls-go-android v0.3.2 // indirect
 	github.com/celo-org/celo-bls-go-ios v0.3.2 // indirect
